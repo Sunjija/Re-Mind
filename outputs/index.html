@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#173d33" />
+  <meta name="description" content="Re:Mind — 마음과 마음 사이, 대화가 다시 이어지도록." />
+  <title>Re:Mind</title>
+  <style>
+    :root {
+      color: #f6f3ea;
+      background: #173d33;
+      font-family: "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body {
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      text-align: center;
+    }
+    main { max-width: 430px; }
+    strong {
+      display: block;
+      margin-bottom: 18px;
+      font-size: clamp(42px, 12vw, 72px);
+      line-height: .9;
+      letter-spacing: -.08em;
+    }
+    p { margin: 0; color: rgba(246,243,234,.7); line-height: 1.7; }
+    .links { display: flex; justify-content: center; gap: 8px; margin-top: 28px; }
+    a {
+      padding: 10px 13px;
+      border: 1px solid rgba(246,243,234,.3);
+      color: #f6f3ea;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+    }
+  </style>
+  <script>
+    (() => {
+      const params = new URLSearchParams(location.search);
+      const requested = params.get('view');
+      const isTouchScreen = matchMedia('(pointer: coarse)').matches;
+      const isCompact = matchMedia('(max-width: 820px)').matches || (isTouchScreen && innerWidth <= 1024);
+      const view = requested === 'desktop' || requested === 'mobile'
+        ? requested
+        : (isCompact ? 'mobile' : 'desktop');
+      const page = view === 'mobile'
+        ? 'remind_product_plan_mobile_v0.1.html'
+        : 'remind_product_plan_v0.1.html';
+      location.replace(`./${page}${location.hash || '#1'}`);
+    })();
+  </script>
+</head>
+<body>
+  <main>
+    <strong>Re:Mind</strong>
+    <p>화면에 맞는 발표자료를 여는 중입니다.</p>
+    <div class="links">
+      <a href="./remind_product_plan_mobile_v0.1.html#1">모바일로 보기</a>
+      <a href="./remind_product_plan_v0.1.html#1">PC로 보기</a>
+    </div>
+  </main>
+</body>
+</html>

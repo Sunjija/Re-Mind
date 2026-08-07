@@ -1,0 +1,1128 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#173d33" />
+  <meta name="description" content="Re:Mind 모바일 발표자료 — AI 기반 관계 커뮤니케이션 플랫폼" />
+  <title>Re:Mind — Mobile Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&amp;family=Noto+Sans+KR:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f6f3ea;
+      --paper-2: #eae5d9;
+      --ink: #171b18;
+      --muted: #6f716b;
+      --line: #bbb7ac;
+      --green: #173d33;
+      --green-2: #234d42;
+      --green-soft: #d8e2dc;
+      --orange: #ef5b3e;
+      --orange-soft: #f4ddd5;
+      --white: #fffdf7;
+      --sans: "Noto Sans KR", "Pretendard", "SUIT", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      --serif: "Gowun Batang", "Noto Serif KR", "KoPub Batang", serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      color: var(--ink);
+      background: #151815;
+      font-family: var(--sans);
+      word-break: keep-all;
+      overscroll-behavior: none;
+    }
+
+    button, a { font: inherit; }
+
+    .frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      height: 100svh;
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--paper);
+    }
+
+    .track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      touch-action: pan-x;
+    }
+
+    .track::-webkit-scrollbar { display: none; }
+
+    .slide {
+      position: relative;
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      padding:
+        calc(27px + env(safe-area-inset-top))
+        24px
+        calc(86px + env(safe-area-inset-bottom));
+      overflow: hidden;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+      background: var(--paper);
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 24px;
+      width: 46px;
+      height: 6px;
+      background: var(--orange);
+    }
+
+    .slide::after {
+      content: attr(data-section);
+      position: absolute;
+      right: -4px;
+      bottom: 66px;
+      z-index: 0;
+      color: var(--ink);
+      opacity: 0.035;
+      font-size: clamp(62px, 21vw, 94px);
+      font-weight: 900;
+      line-height: 0.86;
+      letter-spacing: -0.08em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .head,
+    .foot {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .brand {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      text-transform: none;
+    }
+
+    .foot {
+      padding-top: 10px;
+      border-top: 1px solid rgba(23,27,24,0.16);
+    }
+
+    .body {
+      position: relative;
+      z-index: 2;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .kicker {
+      margin: 0 0 12px;
+      color: var(--orange);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+    }
+
+    h1, h2, h3, p, blockquote { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 0;
+      color: var(--green);
+      font-size: clamp(58px, 18vw, 80px);
+      font-weight: 900;
+      line-height: 0.88;
+      letter-spacing: -0.085em;
+    }
+
+    h2 {
+      margin-bottom: 26px;
+      font-size: clamp(32px, 9.4vw, 44px);
+      font-weight: 800;
+      line-height: 1.19;
+      letter-spacing: -0.065em;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: clamp(18px, 5.3vw, 24px);
+      font-weight: 800;
+      line-height: 1.35;
+      letter-spacing: -0.045em;
+    }
+
+    p {
+      margin-bottom: 0;
+      font-size: clamp(15px, 4.1vw, 18px);
+      line-height: 1.66;
+      letter-spacing: -0.035em;
+      text-wrap: pretty;
+      overflow-wrap: break-word;
+    }
+
+    h1, h2, h3, .cover-sub, .big-question, .vision-title { text-wrap: balance; }
+    blockquote { text-wrap: pretty; overflow-wrap: break-word; }
+    .line { display: block; }
+    h2 .line + .line, .cover-sub .line + .line, .vision-title .line + .line { margin-top: 0.06em; }
+    [data-section="Human"] h2 { font-size: clamp(27px, 7vw, 31px); }
+    [data-section="Human"] h2 .line:first-child { white-space: nowrap; }
+
+    .serif { font-family: var(--serif); }
+    .green { color: var(--green); }
+    .orange { color: var(--orange); }
+    .muted { color: var(--muted); }
+
+    .cover {
+      color: var(--paper);
+      background: var(--green);
+    }
+
+    .cover::before { left: 0; width: 38%; height: 8px; }
+    .cover::after {
+      content: "R";
+      right: -20px;
+      bottom: -44px;
+      color: var(--paper);
+      opacity: 0.035;
+      font-family: var(--serif);
+      font-size: 290px;
+      font-weight: 400;
+    }
+
+    .cover .head,
+    .cover .foot { color: rgba(246,243,234,0.58); }
+    .cover .foot { border-top-color: rgba(246,243,234,0.18); }
+    .cover h1 { color: var(--paper); }
+    .cover h1::first-letter { color: var(--orange); }
+
+    .cover-sub {
+      margin: 24px 0 20px;
+      font-family: var(--serif);
+      font-size: clamp(25px, 7.3vw, 34px);
+      line-height: 1.45;
+      letter-spacing: -0.055em;
+    }
+
+    .cover-copy {
+      max-width: 330px;
+      color: rgba(246,243,234,0.76);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .cover-tag {
+      width: fit-content;
+      margin-top: 28px;
+      padding: 8px 10px;
+      border: 1px solid rgba(246,243,234,0.34);
+      color: rgba(246,243,234,0.66);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .big-question {
+      margin: 0;
+      padding: 32px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-family: var(--serif);
+      font-size: clamp(34px, 10.2vw, 47px);
+      font-weight: 700;
+      line-height: 1.48;
+      letter-spacing: -0.06em;
+    }
+
+    .answer {
+      margin-top: 24px;
+      padding-left: 18px;
+      border-left: 5px solid var(--orange);
+      color: #3f4742;
+      font-size: 17px;
+      line-height: 1.65;
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 34px;
+    }
+
+    .chat-context {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
+
+    .bubble {
+      width: fit-content;
+      max-width: 86%;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      background: var(--white);
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .bubble.reply {
+      align-self: flex-end;
+      color: var(--paper);
+      border-color: var(--green);
+      background: var(--green);
+    }
+
+    .truth {
+      padding: 22px 0 22px 20px;
+      border-left: 7px solid var(--orange);
+    }
+
+    .truth small {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+    }
+
+    .truth p {
+      font-family: var(--serif);
+      font-size: clamp(24px, 7.1vw, 32px);
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .chain {
+      display: grid;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .chain-item {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 14px;
+      align-items: center;
+      min-height: 94px;
+      padding: 13px 6px;
+    }
+
+    .chain-item + .chain-item { border-top: 1px solid var(--line); }
+    .chain-item:last-child { color: var(--paper); background: var(--green); margin: 0 -1px; padding-left: 14px; }
+
+    .chain-num {
+      color: var(--orange);
+      font-family: var(--serif);
+      font-size: 26px;
+    }
+
+    .chain-item p { font-size: 17px; font-weight: 700; line-height: 1.45; }
+    .chain-item small { color: var(--muted); font-size: 11px; }
+    .chain-item:last-child small { color: #b9c9c2; }
+
+    .insight {
+      padding: 30px 24px;
+      border-left: 8px solid var(--orange);
+      background: var(--white);
+    }
+
+    .insight p {
+      font-family: var(--serif);
+      font-size: clamp(21px, 6.1vw, 27px);
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    .stack {
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .stack-item {
+      min-height: 108px;
+      padding: 18px 16px;
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .stack-item + .stack-item { border-top: 1px solid var(--line); }
+    .stack-item.highlight { color: var(--paper); background: var(--green); }
+
+    .stack-label {
+      align-self: start;
+      color: var(--orange);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+    }
+
+    .stack-item.highlight .stack-label { color: #a9beb5; }
+    .stack-item h3 { font-size: 18px; }
+    .stack-item p { color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .stack-item.highlight p { color: #bbc9c3; }
+
+    .statement-list { border-top: 1px solid var(--ink); }
+
+    .statement {
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .statement small {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+    }
+
+    .statement p { font-size: 21px; font-weight: 750; line-height: 1.45; }
+    .statement:last-child { border-bottom: 6px solid var(--green); }
+    .statement:last-child p { color: var(--green); }
+
+    .rewrite {
+      display: grid;
+      gap: 13px;
+    }
+
+    .rewrite-card {
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+    }
+
+    .rewrite-card.bad { opacity: 0.68; }
+
+    .rewrite-card.good {
+      color: var(--paper);
+      border: 0;
+      border-left: 7px solid var(--orange);
+      background: var(--green);
+    }
+
+    .tag {
+      display: inline-block;
+      margin-bottom: 13px;
+      padding: 4px 6px;
+      color: #95412e;
+      background: var(--orange-soft);
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .rewrite-card.good .tag { color: var(--paper); background: rgba(255,255,255,0.12); }
+
+    blockquote {
+      margin-bottom: 0;
+      font-family: var(--serif);
+      font-size: clamp(17px, 5vw, 22px);
+      font-weight: 700;
+      line-height: 1.58;
+      letter-spacing: -0.04em;
+    }
+
+    .rewrite-arrow { height: 20px; color: var(--orange); text-align: center; font-weight: 900; }
+
+    .role-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .role {
+      min-height: 340px;
+      padding: 20px 16px;
+      border-left: 6px solid var(--orange);
+    }
+
+    .role.no {
+      color: var(--paper);
+      border-left: 0;
+      background: var(--green);
+    }
+
+    .role h3 { font-size: 16px; }
+
+    .plain-list {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .plain-list li {
+      padding: 11px 0;
+      border-bottom: 1px solid rgba(111,113,107,0.25);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .role.no li { color: rgba(246,243,234,0.76); border-bottom-color: rgba(255,255,255,0.15); }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--ink);
+    }
+
+    .flow-item {
+      min-height: 160px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .flow-item:nth-child(even) { border-left: 1px solid var(--line); }
+    .flow-item:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .flow-item:last-child { color: var(--paper); background: var(--green); }
+
+    .flow-num { color: var(--orange); font-family: var(--serif); font-size: 30px; }
+    .flow-item h3 { font-size: 17px; }
+    .flow-item p { color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .flow-item:last-child p { color: #bac9c3; }
+
+    .question-sheet {
+      padding: 18px;
+      border: 1px solid var(--ink);
+      background: var(--white);
+      box-shadow: 11px 11px 0 var(--paper-2);
+    }
+
+    .sheet-head {
+      margin: -18px -18px 21px;
+      padding: 9px 12px;
+      color: var(--paper);
+      background: var(--green);
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 0.13em;
+    }
+
+    .sheet-question {
+      margin-bottom: 17px;
+      font-family: var(--serif);
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .choice {
+      margin-top: 6px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      font-size: 11px;
+    }
+
+    .choice.selected { border-left: 5px solid var(--orange); background: var(--green-soft); font-weight: 700; }
+
+    .choice-note {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .receiver-note {
+      padding: 28px 22px;
+      border-left: 8px solid var(--orange);
+      background: var(--white);
+    }
+
+    .receiver-note p {
+      font-family: var(--serif);
+      font-size: 23px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .chips { display: grid; gap: 7px; margin-top: 22px; }
+    .chip { padding: 10px 12px; border: 1px solid var(--line); color: var(--green); font-size: 11px; font-weight: 700; }
+
+    .scope {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .scope-col { padding: 18px 15px; border-left: 6px solid var(--orange); }
+    .scope-col.later { border-left: 1px solid var(--line); background: var(--paper-2); }
+    .scope-col h3 { font-size: 15px; }
+    .scope-col li { font-size: 11px; }
+    .scope-col.later li { color: var(--muted); }
+
+    .hypotheses { counter-reset: item; border-top: 1px solid var(--ink); }
+
+    .hypothesis {
+      counter-increment: item;
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 15px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hypothesis::before {
+      content: "0" counter(item);
+      color: var(--orange);
+      font-family: var(--serif);
+      font-size: 28px;
+    }
+
+    .hypothesis p { font-size: 17px; font-weight: 700; line-height: 1.5; }
+
+    .north-star {
+      margin-bottom: 18px;
+      padding: 25px 22px;
+      border-left: 8px solid var(--orange);
+      color: var(--paper);
+      background: var(--green);
+    }
+
+    .north-star small { display:block; margin-bottom:10px; color:#a8bdb4; font-size:8px; font-weight:900; letter-spacing:.14em; }
+    .north-star p { font-size: 19px; font-weight: 700; line-height: 1.55; }
+
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+    .metric { padding: 11px 0; border-bottom: 1px solid var(--line); }
+    .metric b { display: block; margin-bottom: 3px; font-size: 12px; }
+    .metric span { color: var(--muted); font-size: 9px; }
+
+    .safety-list { border-top: 1px solid var(--ink); }
+
+    .safety {
+      display: grid;
+      grid-template-columns: 47px 1fr;
+      gap: 15px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--line);
+      align-items: start;
+    }
+
+    .safety b:first-child { color: var(--orange); font-family: var(--serif); font-size: 25px; font-weight: 400; }
+    .safety h3 { margin-bottom: 4px; font-size: 16px; }
+    .safety p { color: var(--muted); font-size: 11px; line-height: 1.55; }
+
+    .plans { display: grid; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+    .plan { padding: 20px; border-left: 6px solid var(--orange); }
+    .plan + .plan { color: var(--paper); border-left: 0; background: var(--green); }
+    .plan h3 { font-size: 24px; }
+    .plan p { color: var(--muted); font-size: 11px; }
+    .plan + .plan p { color: #b9c9c2; }
+    .plan .plain-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; margin-top: 10px; }
+    .plan .plain-list li { padding: 8px 0; font-size: 10px; }
+    .plan + .plan li { border-bottom-color: rgba(255,255,255,.14); }
+
+    .vision {
+      color: var(--paper);
+      background: var(--green);
+    }
+
+    .vision::before { left: 0; width: 38%; height: 8px; }
+    .vision::after { color: var(--paper); opacity: .025; }
+    .vision .head, .vision .foot { color: rgba(246,243,234,.58); }
+    .vision .foot { border-top-color: rgba(246,243,234,.18); }
+
+    .vision-title {
+      margin-bottom: 26px;
+      font-family: var(--serif);
+      font-size: clamp(34px, 10.4vw, 47px);
+      font-weight: 700;
+      line-height: 1.46;
+      letter-spacing: -0.06em;
+    }
+
+    .vision-title .line { color: inherit; }
+    .vision-title .line:last-child { color: #f58f78; }
+
+    .relations {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 28px 0 0;
+    }
+
+    .relation {
+      padding: 8px 11px;
+      border: 1px solid rgba(246,243,234,.28);
+      color: rgba(246,243,234,.72);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .05em;
+    }
+
+    .dock {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 50;
+      height: calc(66px + env(safe-area-inset-bottom));
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+      display: grid;
+      grid-template-columns: 42px 1fr 42px;
+      gap: 12px;
+      align-items: center;
+      border-top: 1px solid rgba(23,27,24,.14);
+      background: rgba(246,243,234,.94);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 1px solid rgba(23,27,24,.24);
+      border-radius: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .nav:disabled { opacity: .26; }
+
+    .progress-wrap { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+    .progress { height: 1px; background: rgba(23,27,24,.18); }
+    .bar { width: 5.26%; height: 3px; margin-top: -1px; background: var(--orange); transition: width 180ms ease; }
+    .count { min-width: 34px; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .08em; text-align: right; }
+
+    .swipe-hint {
+      position: absolute;
+      left: 50%;
+      bottom: calc(75px + env(safe-area-inset-bottom));
+      z-index: 60;
+      padding: 7px 10px;
+      color: var(--paper);
+      background: rgba(23,27,24,.78);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      transform: translate(-50%, 8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .swipe-hint.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (min-width: 520px) {
+      .frame {
+        max-width: 430px;
+        max-height: 900px;
+        top: 50%;
+        transform: translateY(-50%);
+        box-shadow: 0 22px 80px rgba(0,0,0,.36);
+      }
+    }
+
+    @media (max-height: 700px) {
+      .slide {
+        padding-top: calc(19px + env(safe-area-inset-top));
+        padding-bottom: calc(76px + env(safe-area-inset-bottom));
+        gap: 10px;
+      }
+      h2 { margin-bottom: 17px; font-size: clamp(28px, 8.5vw, 38px); }
+      .body { justify-content: flex-start; padding-top: 3vh; }
+      .cover .body, .vision .body { justify-content: center; padding-top: 0; }
+      .role { min-height: 295px; }
+      .flow-item { min-height: 135px; }
+      .plain-list li { padding: 8px 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .track { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
+    }
+
+    @media print {
+      html, body { overflow: visible; background: white; }
+      .frame { width: 108mm; height: auto; max-width: none; max-height: none; transform: none; overflow: visible; }
+      .track { display: block; overflow: visible; }
+      .slide { width: 108mm; height: 192mm; page-break-after: always; }
+      .dock, .swipe-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="frame" id="frame">
+    <div class="track" id="track" aria-live="polite">
+      <section class="slide cover" data-section="01" aria-label="1. 표지">
+        <header class="head"><span>Product Plan</span><span>Mobile · v0.1</span></header>
+        <div class="body">
+          <h1>Re:Mind</h1>
+          <p class="cover-sub"><span class="line">마음과 마음 사이,</span><span class="line">대화가 다시</span><span class="line">이어지도록.</span></p>
+          <p class="cover-copy">내 감정을 이해하고, 나다운 말로 상대에게 전하도록 돕는 관계 대화 서비스</p>
+          <span class="cover-tag">AI 기반 관계 대화 서비스</span>
+        </div>
+        <footer class="foot"><span>Re:Mind</span><span>01</span></footer>
+      </section>
+
+      <section class="slide" data-section="How" aria-label="2. 서비스 이용 방식">
+        <header class="head"><span class="brand">Re:Mind</span><span>How it works</span></header>
+        <div class="body">
+          <p class="kicker">Re:Mind는 이렇게 작동합니다</p>
+          <h2><span class="line">한 사람의 마음에서</span><span class="line">둘의 대화까지.</span></h2>
+          <div class="flow">
+            <article class="flow-item"><span class="flow-num">01</span><div><h3>마음을 적는다</h3><p>싸운 뒤, 하고 싶었던 말을 꺼낸다.</p></div></article>
+            <article class="flow-item"><span class="flow-num">02</span><div><h3>질문으로 정리한다</h3><p>AI가 감정과 바람을 확인하도록 돕는다.</p></div></article>
+            <article class="flow-item"><span class="flow-num">03</span><div><h3>마음을 전한다</h3><p>내 마음이 잘 담겼는지 읽어보고 상대에게 보낸다.</p></div></article>
+            <article class="flow-item"><span class="flow-num">04</span><div><h3>각자의 마음으로 답한다</h3><p>상대도 바로 답하지 않고 마음부터 정리한다.</p></div></article>
+          </div>
+        </div>
+        <footer class="foot"><span>01 / How it works</span><span>02</span></footer>
+      </section>
+
+      <section class="slide" data-section="Problem" aria-label="3. 문제">
+        <header class="head"><span class="brand">Re:Mind</span><span>Problem</span></header>
+        <div class="body">
+          <p class="kicker">메신저에서 벌어지는 일</p>
+          <h2><span class="line">감정보다 표현이</span><span class="line">먼저 도착한다.</span></h2>
+          <div class="chat">
+            <span class="chat-context">늦은 저녁, 기다리던 연락이 없었을 때</span>
+            <div class="bubble">연락 한 번 하는 게 그렇게 어려워?</div>
+            <div class="bubble reply">나도 정신없었어. 꼭 그렇게 말해야 해?</div>
+          </div>
+          <div class="truth">
+            <small>정작 하고 싶었던 말</small>
+            <p>“연락을 기다리는 동안, 내가 중요하지 않은 사람처럼 느껴져서 서운했어.”</p>
+          </div>
+        </div>
+        <footer class="foot"><span>02 / Problem</span><span>03</span></footer>
+      </section>
+
+      <section class="slide" data-section="Problem" aria-label="4. 갈등이 커지는 구조">
+        <header class="head"><span class="brand">Re:Mind</span><span>Problem</span></header>
+        <div class="body">
+          <p class="kicker">갈등이 커지는 구조</p>
+          <h2><span class="line">마음은 뒤에 남고,</span><span class="line">날카로운 말만</span><span class="line">기억된다.</span></h2>
+          <div class="chain">
+            <div class="chain-item"><span class="chain-num">01</span><div><p>마음</p><small>서운함 · 외로움 · 불안함</small></div></div>
+            <div class="chain-item"><span class="chain-num">02</span><div><p>표현</p><small>“맨날” · “됐어” · “마음대로 해”</small></div></div>
+            <div class="chain-item"><span class="chain-num">03</span><div><p>반응</p><small>방어하고 · 반격하고 · 대화를 닫는다</small></div></div>
+          </div>
+        </div>
+        <footer class="foot"><span>02 / Problem</span><span>04</span></footer>
+      </section>
+
+      <section class="slide" data-section="Insight" aria-label="5. 인사이트">
+        <header class="head"><span class="brand">Re:Mind</span><span>Insight</span></header>
+        <div class="body">
+          <p class="kicker">우리가 주목한 것</p>
+          <div class="insight">
+            <p>많은 관계에서 갈등 자체보다, <span class="orange">내 마음과 의도가 제대로 닿지 않았다는 경험</span>이 두 사람의 거리를 키운다.</p>
+          </div>
+          <p class="muted" style="margin-top:22px;font-size:13px">갈등을 판정하는 대신, 이해가 시작될 틈을 만든다.</p>
+        </div>
+        <footer class="foot"><span>03 / Insight</span><span>05</span></footer>
+      </section>
+
+      <section class="slide" data-section="Gap" aria-label="6. 시장의 빈자리">
+        <header class="head"><span class="brand">Re:Mind</span><span>Market gap</span></header>
+        <div class="body">
+          <p class="kicker">지금의 선택지</p>
+          <h2><span class="line">기록하거나,</span><span class="line">혼자 상담하거나.</span></h2>
+          <div class="stack">
+            <article class="stack-item"><span class="stack-label">커플 앱</span><div><h3>관계를 기록한다</h3><p>일정 · 기념일 · 사진 · 채팅</p></div></article>
+            <article class="stack-item"><span class="stack-label">AI 상담</span><div><h3>혼자 마음을 푼다</h3><p>사용자와 AI의 1:1 대화</p></div></article>
+            <article class="stack-item highlight"><span class="stack-label">Re:Mind</span><div><h3>둘의 대화를 잇는다</h3><p>각자의 마음을 정리한 뒤 서로에게 전달</p></div></article>
+          </div>
+        </div>
+        <footer class="foot"><span>04 / Gap</span><span>06</span></footer>
+      </section>
+
+      <section class="slide" data-section="Solution" aria-label="7. 해결 방법">
+        <header class="head"><span class="brand">Re:Mind</span><span>Solution</span></header>
+        <div class="body">
+          <p class="kicker">Re:Mind가 하는 일</p>
+          <h2><span class="line">이해할 수 있는</span><span class="line">대화를 설계한다.</span></h2>
+          <div class="statement-list">
+            <div class="statement"><small>판단하지 않고</small><p>누가 맞는지 정하지 않는다.</p></div>
+            <div class="statement"><small>설득하지 않고</small><p>관계를 유지하라 말하지 않는다.</p></div>
+            <div class="statement"><small>대신</small><p>서로의 마음이 닿을 틈을 만든다.</p></div>
+          </div>
+        </div>
+        <footer class="foot"><span>05 / Solution</span><span>07</span></footer>
+      </section>
+
+      <section class="slide" data-section="Human" aria-label="8. 휴먼 퍼스트">
+        <header class="head"><span class="brand">Re:Mind</span><span>Human first</span></header>
+        <div class="body">
+          <p class="kicker">가장 중요한 제품 원칙</p>
+          <h2><span class="line">AI가 대신 쓰지 않는다.</span><span class="line green">사람의 말을</span><span class="line green">찾도록 돕는다.</span></h2>
+          <div class="insight">
+            <p style="font-size:22px">좋은 문장을 만드는 것보다, 사용자의 진짜 문장을 찾는 것이 먼저다.</p>
+          </div>
+        </div>
+        <footer class="foot"><span>06 / Human first</span><span>08</span></footer>
+      </section>
+
+      <section class="slide" data-section="Voice" aria-label="9. 말투 보존">
+        <header class="head"><span class="brand">Re:Mind</span><span>Voice</span></header>
+        <div class="body">
+          <p class="kicker">매끈함보다 내 말다움</p>
+          <div class="rewrite">
+            <article class="rewrite-card bad">
+              <span class="tag">과하게 보정된 말</span>
+              <blockquote>“당신과의 관계를 소중히 여기기에 깊은 외로움과 서운함을 느꼈습니다.”</blockquote>
+            </article>
+            <div class="rewrite-arrow">↓</div>
+            <article class="rewrite-card good">
+              <span class="tag">내 말에 가까운 표현</span>
+              <blockquote>“연락이 없을 때 내가 별로 중요하지 않은 사람처럼 느껴져서 서운했어.”</blockquote>
+            </article>
+          </div>
+        </div>
+        <footer class="foot"><span>06 / Human first</span><span>09</span></footer>
+      </section>
+
+      <section class="slide" data-section="Guide" aria-label="10. AI의 역할">
+        <header class="head"><span class="brand">Re:Mind</span><span>Role of AI</span></header>
+        <div class="body">
+          <p class="kicker">AI의 자리</p>
+          <h2><span class="line">주인공이 아니라,</span><span class="line">한 걸음 뒤의</span><span class="line">길잡이.</span></h2>
+          <div class="role-box">
+            <article class="role"><h3 class="green">하는 것</h3><ul class="plain-list"><li>돌아볼 질문</li><li>오해 표현 점검</li><li>말투를 살린 정리</li><li>사용자의 최종 선택</li></ul></article>
+            <article class="role no"><h3>하지 않는 것</h3><ul class="plain-list"><li>감정 단정</li><li>없던 사과 추가</li><li>조언과 훈계</li><li>완벽한 편지 대필</li></ul></article>
+          </div>
+        </div>
+        <footer class="foot"><span>06 / Human first</span><span>10</span></footer>
+      </section>
+
+      <section class="slide" data-section="Flow" aria-label="11. 핵심 경험">
+        <header class="head"><span class="brand">Re:Mind</span><span>Core experience</span></header>
+        <div class="body">
+          <p class="kicker">하나의 대화가 만들어지는 과정</p>
+          <h2><span class="line">바로 보내지 않고,</span><span class="line">한 번 마음을</span><span class="line">거친다.</span></h2>
+          <div class="flow">
+            <article class="flow-item"><span class="flow-num">01</span><div><h3>꺼내기</h3><p>무슨 일이 있었는지 적는다.</p></div></article>
+            <article class="flow-item"><span class="flow-num">02</span><div><h3>발견하기</h3><p>감정과 바람을 확인한다.</p></div></article>
+            <article class="flow-item"><span class="flow-num">03</span><div><h3>전달하기</h3><p>내 마음이 잘 담겼는지 읽어보고 상대에게 보낸다.</p></div></article>
+            <article class="flow-item"><span class="flow-num">04</span><div><h3>이해하기</h3><p>상대도 마음부터 정리한다.</p></div></article>
+          </div>
+        </div>
+        <footer class="foot"><span>07 / Core experience</span><span>11</span></footer>
+      </section>
+
+      <section class="slide" data-section="Sender" aria-label="12. 발신자 경험">
+        <header class="head"><span class="brand">Re:Mind</span><span>Sender</span></header>
+        <div class="body">
+          <p class="kicker">질문은 짧게, 선택권은 분명하게</p>
+          <div class="question-sheet">
+            <div class="sheet-head">MIND CHECK / 01</div>
+            <p class="sheet-question">그 순간, 가장 가까웠던 마음은 무엇이었나요?</p>
+            <div class="choice">화가 났다</div>
+            <div class="choice selected">혼자인 것 같았다</div>
+            <div class="choice">무시당한 것 같았다</div>
+            <div class="choice">내 말로 적을게요</div>
+          </div>
+          <p class="choice-note">2~5개의 맞춤 질문 · 감정은 사용자가 직접 선택 · 보정 강도도 직접 결정</p>
+        </div>
+        <footer class="foot"><span>07 / Core experience</span><span>12</span></footer>
+      </section>
+
+      <section class="slide" data-section="Receiver" aria-label="13. 수신자 경험">
+        <header class="head"><span class="brand">Re:Mind</span><span>Receiver</span></header>
+        <div class="body">
+          <p class="kicker">답장을 재촉하지 않는 수신 경험</p>
+          <h2><span class="line">읽는 것만으로도</span><span class="line">충분할 수 있다.</span></h2>
+          <div class="receiver-note">
+            <p>“상대가 자신의 마음을 정리해 보낸 메시지예요. <span class="green">바로 답하지 않아도 괜찮아요.</span>”</p>
+            <div class="chips"><span class="chip">읽었어요</span><span class="chip">생각할 시간이 필요해요</span><span class="chip">답장하고 싶어요</span></div>
+          </div>
+        </div>
+        <footer class="foot"><span>07 / Core experience</span><span>13</span></footer>
+      </section>
+
+      <section class="slide" data-section="MVP" aria-label="14. MVP">
+        <header class="head"><span class="brand">Re:Mind</span><span>MVP</span></header>
+        <div class="body">
+          <p class="kicker">첫 번째 제품</p>
+          <h2><span class="line">한 번의 갈등을</span><span class="line">한 번의 안전한</span><span class="line">대화로.</span></h2>
+          <div class="scope">
+            <article class="scope-col"><h3 class="green">Version 1.0</h3><ul class="plain-list"><li>빠른 감정 입력</li><li>2~5개 맞춤 질문</li><li>말투 보존 메시지</li><li>수정·확인·공유</li><li>웹 링크 열람</li><li>부담 없는 반응</li></ul></article>
+            <article class="scope-col later"><h3 class="muted">다음 단계</h3><ul class="plain-list"><li>커플 연결</li><li>갈등 기록</li><li>관계 리포트</li><li>성장 프로그램</li></ul></article>
+          </div>
+        </div>
+        <footer class="foot"><span>08 / MVP</span><span>14</span></footer>
+      </section>
+
+      <section class="slide" data-section="Proof" aria-label="15. 검증할 가설">
+        <header class="head"><span class="brand">Re:Mind</span><span>What to prove</span></header>
+        <div class="body">
+          <p class="kicker">MVP가 답해야 할 세 가지</p>
+          <h2><span class="line">우리가 먼저</span><span class="line">확인해야 하는 것.</span></h2>
+          <div class="hypotheses">
+            <div class="hypothesis"><p>후회할 말을 보내기 전에 Re:Mind를 열까?</p></div>
+            <div class="hypothesis"><p>정리된 문장이 내 마음에 더 가깝다고 느낄까?</p></div>
+            <div class="hypothesis"><p>상대는 부담 없이 읽고 마음을 이해할 수 있을까?</p></div>
+          </div>
+        </div>
+        <footer class="foot"><span>08 / MVP</span><span>15</span></footer>
+      </section>
+
+      <section class="slide" data-section="Metric" aria-label="16. 성공 지표">
+        <header class="head"><span class="brand">Re:Mind</span><span>Success metric</span></header>
+        <div class="body">
+          <p class="kicker">많이 쓰는 앱보다, 제대로 닿는 경험</p>
+          <div class="north-star"><small>NORTH STAR</small><p>“상대의 마음을 이전보다 이해했다”고 답한 세션의 비율</p></div>
+          <div class="metric-grid">
+            <div class="metric"><b>내 마음 정확도</b><span>정말 내 뜻인가</span></div>
+            <div class="metric"><b>발송 후 후회</b><span>지우고 싶지 않았는가</span></div>
+            <div class="metric"><b>편지 열람</b><span>부담 없이 열었는가</span></div>
+            <div class="metric"><b>이해의 변화</b><span>새롭게 알게 됐는가</span></div>
+            <div class="metric"><b>대화 완주</b><span>양쪽으로 이어졌는가</span></div>
+            <div class="metric"><b>안전 지표</b><span>강요와 신고는 없는가</span></div>
+          </div>
+        </div>
+        <footer class="foot"><span>09 / Metrics</span><span>16</span></footer>
+      </section>
+
+      <section class="slide" data-section="Trust" aria-label="17. 신뢰와 안전">
+        <header class="head"><span class="brand">Re:Mind</span><span>Trust &amp; safety</span></header>
+        <div class="body">
+          <p class="kicker">관계를 다루는 제품의 기본</p>
+          <h2><span class="line">이해를 돕되,</span><span class="line">위험한 관계는</span><span class="line">중재하지 않는다.</span></h2>
+          <div class="safety-list">
+            <article class="safety"><b>01</b><div><h3>대화의 동의</h3><p>답장·읽음 표시·추가 연락을 강요하지 않는다.</p></div></article>
+            <article class="safety"><b>02</b><div><h3>위험 상황 분리</h3><p>폭력·협박·스토킹·자해 위험에서는 도움을 안내한다.</p></div></article>
+            <article class="safety"><b>03</b><div><h3>민감한 기록 보호</h3><p>링크 만료, 차단, 기록 삭제 선택권을 제공한다.</p></div></article>
+          </div>
+        </div>
+        <footer class="foot"><span>10 / Trust</span><span>17</span></footer>
+      </section>
+
+      <section class="slide" data-section="Model" aria-label="18. 비즈니스 모델">
+        <header class="head"><span class="brand">Re:Mind</span><span>Business model</span></header>
+        <div class="body">
+          <p class="kicker">기본 대화는 열어두고, 긴 호흡에 과금한다</p>
+          <div class="plans">
+            <article class="plan"><h3>Free</h3><p>한 번의 마음을 안전하게 전달하는 기본 경험</p><ul class="plain-list"><li>감정 탐색</li><li>메시지 정리</li><li>웹 열람</li><li>기본 답장</li></ul></article>
+            <article class="plan"><h3>Premium</h3><p>관계를 평가하는 대신 변화를 돌아보는 기능</p><ul class="plain-list"><li>감정 회고</li><li>반복 패턴</li><li>대화 설정</li><li>공동 회고</li></ul></article>
+          </div>
+        </div>
+        <footer class="foot"><span>11 / Business</span><span>18</span></footer>
+      </section>
+
+      <section class="slide vision" data-section="Vision" aria-label="19. 비전">
+        <header class="head"><span>Re:Mind</span><span>Vision</span></header>
+        <div class="body">
+          <p class="kicker">장기 비전</p>
+          <p class="vision-title"><span class="line">좋은 말보다,</span><span class="line">내 진짜 마음을</span><span class="line">찾게 한다.</span></p>
+          <p style="color:rgba(246,243,234,.74)">연인에서 시작해, 서로를 이해하려는 모든 관계의 커뮤니케이션 플랫폼으로.</p>
+          <div class="relations"><span class="relation">연인</span><span class="relation">부부</span><span class="relation">부모와 자녀</span><span class="relation">친구</span><span class="relation">동료</span></div>
+        </div>
+        <footer class="foot"><span>말보다 마음이 먼저 닿도록</span><span>19</span></footer>
+      </section>
+    </div>
+
+    <nav class="dock" aria-label="슬라이드 이동">
+      <button class="nav" id="prev" type="button" aria-label="이전 슬라이드">←</button>
+      <div class="progress-wrap" aria-label="진행 상태">
+        <div class="progress"><div class="bar" id="bar"></div></div>
+        <span class="count" id="count">01/19</span>
+      </div>
+      <button class="nav" id="next" type="button" aria-label="다음 슬라이드">→</button>
+    </nav>
+    <div class="swipe-hint" id="hint">옆으로 밀어서 넘겨보세요 →</div>
+  </main>
+
+  <script>
+    (() => {
+      const track = document.getElementById('track');
+      const slides = [...track.querySelectorAll('.slide')];
+      const prev = document.getElementById('prev');
+      const next = document.getElementById('next');
+      const bar = document.getElementById('bar');
+      const count = document.getElementById('count');
+      const hint = document.getElementById('hint');
+      let current = 0;
+      let settleTimer;
+
+      const pad = value => String(value).padStart(2, '0');
+
+      function update(index, syncHash = true) {
+        current = Math.max(0, Math.min(slides.length - 1, index));
+        count.textContent = `${pad(current + 1)}/${pad(slides.length)}`;
+        bar.style.width = `${((current + 1) / slides.length) * 100}%`;
+        prev.disabled = current === 0;
+        next.disabled = current === slides.length - 1;
+        if (syncHash) history.replaceState(null, '', `#${current + 1}`);
+        document.title = `Re:Mind — ${pad(current + 1)}`;
+      }
+
+      function go(index, behavior = 'smooth') {
+        const target = Math.max(0, Math.min(slides.length - 1, index));
+        slides[target].scrollIntoView({ behavior, block: 'nearest', inline: 'start' });
+        update(target);
+      }
+
+      prev.addEventListener('click', () => go(current - 1));
+      next.addEventListener('click', () => go(current + 1));
+
+      track.addEventListener('scroll', () => {
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(() => {
+          const index = Math.round(track.scrollLeft / track.clientWidth);
+          if (index !== current) update(index);
+        }, 70);
+      }, { passive: true });
+
+      document.addEventListener('keydown', event => {
+        if (['ArrowRight', 'PageDown', ' '].includes(event.key)) { event.preventDefault(); go(current + 1); }
+        if (['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); go(current - 1); }
+        if (event.key === 'Home') { event.preventDefault(); go(0); }
+        if (event.key === 'End') { event.preventDefault(); go(slides.length - 1); }
+      });
+
+      window.addEventListener('resize', () => go(current, 'auto'));
+      window.addEventListener('hashchange', () => {
+        const value = Number(location.hash.slice(1));
+        if (value >= 1 && value <= slides.length) go(value - 1, 'auto');
+      });
+
+      const initial = Number(location.hash.slice(1));
+      requestAnimationFrame(() => go(initial >= 1 && initial <= slides.length ? initial - 1 : 0, 'auto'));
+      setTimeout(() => hint.classList.add('show'), 450);
+      setTimeout(() => hint.classList.remove('show'), 2800);
+    })();
+  </script>
+</body>
+</html>

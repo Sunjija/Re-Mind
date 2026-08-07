@@ -1,0 +1,2273 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Re:Mind AI 기반 관계 회복 플랫폼 서비스 기획안 v0.1" />
+  <title>Re:Mind — Product Plan v0.1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&amp;family=Noto+Sans+KR:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f4f0e7;
+      --paper-2: #ebe5d9;
+      --ink: #202522;
+      --muted: #6f746e;
+      --line: #cbc5b9;
+      --green: #244f43;
+      --green-soft: #dbe5df;
+      --orange: #e56a4b;
+      --orange-soft: #f4ded6;
+      --white: #fffdf8;
+      --shadow: 0 18px 60px rgba(48, 43, 35, 0.12);
+      --sans: "Pretendard", "SUIT", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      --serif: "Noto Serif KR", "KoPub Batang", "Batang", serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      color: var(--ink);
+      background: #d8d3c9;
+      font-family: var(--sans);
+      word-break: keep-all;
+    }
+
+    button { font: inherit; }
+
+    .deck {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: var(--paper);
+      isolation: isolate;
+    }
+
+    .deck::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 30;
+      box-shadow: inset 0 0 120px rgba(40, 36, 30, 0.04);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: clamp(20px, 3vh, 42px);
+      padding: clamp(28px, 5vw, 78px) clamp(28px, 7vw, 110px) clamp(62px, 7vh, 92px);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(20px);
+      transition: opacity 260ms ease, transform 320ms ease, visibility 0s linear 320ms;
+      background: var(--paper);
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+      transition-delay: 0s;
+      z-index: 2;
+    }
+
+    .slide.previous { transform: translateX(-20px); }
+
+    .slide-head,
+    .slide-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: clamp(10px, 0.9vw, 14px);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .brand {
+      color: var(--green);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-transform: none;
+      font-size: clamp(14px, 1.25vw, 20px);
+    }
+
+    .slide-body {
+      display: flex;
+      min-height: 0;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--orange);
+      font-size: clamp(12px, 1vw, 16px);
+      font-weight: 800;
+      letter-spacing: 0.12em;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 22px;
+      font-size: clamp(56px, 10vw, 154px);
+      line-height: 0.92;
+      letter-spacing: -0.075em;
+      color: var(--green);
+    }
+
+    h2 {
+      margin-bottom: clamp(24px, 4vh, 52px);
+      max-width: 1100px;
+      font-size: clamp(34px, 5.2vw, 78px);
+      line-height: 1.12;
+      letter-spacing: -0.055em;
+      font-weight: 760;
+    }
+
+    h3 {
+      margin-bottom: 12px;
+      font-size: clamp(18px, 1.8vw, 28px);
+      line-height: 1.28;
+      letter-spacing: -0.035em;
+    }
+
+    p {
+      margin-bottom: 0;
+      font-size: clamp(16px, 1.55vw, 25px);
+      line-height: 1.65;
+      letter-spacing: -0.025em;
+      text-wrap: pretty;
+      overflow-wrap: break-word;
+    }
+
+    h1, h2, h3, .cover-sub, .quote-big, .closing-copy { text-wrap: balance; }
+    blockquote { text-wrap: pretty; overflow-wrap: break-word; }
+    .line { display: block; }
+    h2 .line + .line, .cover-sub .line + .line, .closing-copy .line + .line { margin-top: 0.06em; }
+
+    .lead {
+      max-width: 850px;
+      color: #3e4540;
+      font-size: clamp(20px, 2.3vw, 36px);
+      line-height: 1.55;
+    }
+
+    .serif { font-family: var(--serif); }
+    .accent { color: var(--orange); }
+    .green { color: var(--green); }
+    .muted { color: var(--muted); }
+    .nowrap { white-space: nowrap; }
+
+    .rule {
+      width: 72px;
+      height: 3px;
+      margin: 8px 0 24px;
+      border: 0;
+      background: var(--orange);
+    }
+
+    .cover .slide-body { align-items: flex-start; }
+
+    .cover-title-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: clamp(18px, 3vw, 46px);
+    }
+
+    .cover-mark {
+      width: clamp(54px, 7vw, 102px);
+      height: clamp(54px, 7vw, 102px);
+      margin-bottom: clamp(5px, 1vw, 16px);
+      border: 2px solid var(--orange);
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .cover-mark::before,
+    .cover-mark::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .cover-mark::before { width: 11%; height: 11%; left: 27%; top: 43%; }
+    .cover-mark::after { width: 11%; height: 11%; right: 27%; top: 43%; }
+
+    .cover-sub {
+      margin: 4px 0 34px;
+      color: var(--ink);
+      font-size: clamp(24px, 3.4vw, 52px);
+      font-weight: 650;
+      letter-spacing: -0.045em;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #555b56;
+      background: rgba(255, 253, 248, 0.5);
+      font-size: clamp(11px, 0.95vw, 14px);
+      font-weight: 650;
+    }
+
+    .quote-stage {
+      max-width: 1240px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: clamp(18px, 3vw, 48px);
+      align-items: center;
+    }
+
+    .quote-big {
+      font-family: var(--serif);
+      font-size: clamp(30px, 4vw, 64px);
+      line-height: 1.35;
+      letter-spacing: -0.055em;
+    }
+
+    .arrow-line {
+      position: relative;
+      width: clamp(52px, 8vw, 120px);
+      height: 1px;
+      background: var(--line);
+    }
+
+    .arrow-line::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: -4px;
+      width: 8px;
+      height: 8px;
+      border-top: 1px solid var(--muted);
+      border-right: 1px solid var(--muted);
+      transform: rotate(45deg);
+    }
+
+    .chat-pair {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(24px, 5vw, 80px);
+      align-items: center;
+      max-width: 1120px;
+    }
+
+    .bubble-wrap { display: flex; flex-direction: column; gap: 12px; }
+
+    .bubble {
+      width: fit-content;
+      max-width: 92%;
+      padding: clamp(15px, 2vw, 28px) clamp(18px, 2.5vw, 34px);
+      border-radius: 26px 26px 26px 5px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      font-size: clamp(18px, 2vw, 31px);
+      line-height: 1.45;
+      letter-spacing: -0.035em;
+    }
+
+    .bubble.reply {
+      align-self: flex-end;
+      border-radius: 26px 26px 5px 26px;
+      color: var(--white);
+      background: var(--green);
+    }
+
+    .bubble-note {
+      color: var(--muted);
+      font-size: clamp(12px, 1vw, 15px);
+    }
+
+    .thought {
+      padding-left: clamp(24px, 4vw, 52px);
+      border-left: 2px solid var(--orange);
+    }
+
+    .thought p:first-child {
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: clamp(12px, 1vw, 16px);
+      font-weight: 750;
+      letter-spacing: 0.08em;
+    }
+
+    .thought p:last-child {
+      font-family: var(--serif);
+      font-size: clamp(26px, 3vw, 46px);
+      line-height: 1.45;
+    }
+
+    .three-step {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 1160px;
+      gap: 0;
+    }
+
+    .step-card {
+      position: relative;
+      min-height: clamp(180px, 26vh, 320px);
+      padding: clamp(22px, 3vw, 40px);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .step-card + .step-card { border-left: 1px solid var(--line); }
+    .step-card:nth-child(2) { background: var(--paper-2); }
+    .step-card:nth-child(3) { background: var(--orange-soft); }
+
+    .step-num {
+      display: block;
+      margin-bottom: clamp(28px, 6vh, 72px);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+    }
+
+    .step-card p {
+      font-size: clamp(19px, 2vw, 30px);
+      font-weight: 720;
+      line-height: 1.38;
+    }
+
+    .insight-box {
+      max-width: 1140px;
+      padding: clamp(32px, 6vw, 78px);
+      border: 1px solid var(--line);
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .insight-box p {
+      max-width: 980px;
+      font-family: var(--serif);
+      font-size: clamp(27px, 3.5vw, 54px);
+      line-height: 1.52;
+      letter-spacing: -0.04em;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(12px, 2vw, 28px);
+      max-width: 1200px;
+    }
+
+    .compare-card {
+      min-height: clamp(210px, 31vh, 390px);
+      padding: clamp(22px, 3vw, 42px);
+      border: 1px solid var(--line);
+      background: rgba(255, 253, 248, 0.55);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .compare-card.ours {
+      color: var(--white);
+      border-color: var(--green);
+      background: var(--green);
+    }
+
+    .compare-label {
+      margin-bottom: auto;
+      font-size: clamp(13px, 1.1vw, 16px);
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .compare-card h3 { font-size: clamp(23px, 2.4vw, 36px); }
+    .compare-card p { color: var(--muted); font-size: clamp(14px, 1.25vw, 19px); }
+    .compare-card.ours p { color: rgba(255,255,255,0.72); }
+
+    .statement {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(15px, 2vh, 26px);
+      max-width: 1050px;
+    }
+
+    .statement-line {
+      display: flex;
+      align-items: baseline;
+      gap: clamp(18px, 3vw, 42px);
+      font-size: clamp(29px, 4vw, 61px);
+      line-height: 1.18;
+      letter-spacing: -0.05em;
+      font-weight: 740;
+    }
+
+    .statement-line .no {
+      min-width: clamp(52px, 6vw, 90px);
+      color: var(--muted);
+      font-size: clamp(12px, 1vw, 15px);
+      letter-spacing: 0.1em;
+    }
+
+    .statement-line:last-child {
+      margin-top: 12px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      color: var(--green);
+    }
+
+    .rewrite {
+      max-width: 1140px;
+      display: grid;
+      grid-template-columns: 1fr 68px 1fr;
+      gap: clamp(14px, 2vw, 30px);
+      align-items: center;
+    }
+
+    .rewrite-card {
+      min-height: clamp(220px, 33vh, 400px);
+      padding: clamp(24px, 3vw, 44px);
+      border: 1px solid var(--line);
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .rewrite-card.bad { background: #eee9df; }
+    .rewrite-card.good { border: 2px solid var(--green); }
+
+    .rewrite-tag {
+      display: inline-flex;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--orange-soft);
+      color: #943f2e;
+      font-size: clamp(11px, 0.9vw, 13px);
+      font-weight: 800;
+    }
+
+    .rewrite-card.good .rewrite-tag {
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .rewrite-card blockquote {
+      margin: 24px 0;
+      font-family: var(--serif);
+      font-size: clamp(21px, 2.4vw, 37px);
+      line-height: 1.55;
+      letter-spacing: -0.035em;
+    }
+
+    .rewrite-card small {
+      color: var(--muted);
+      font-size: clamp(11px, 0.9vw, 14px);
+      line-height: 1.5;
+    }
+
+    .rewrite-arrow {
+      text-align: center;
+      color: var(--orange);
+      font-size: 32px;
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(18px, 3vw, 38px);
+      max-width: 1100px;
+    }
+
+    .role-card {
+      padding: clamp(25px, 3.5vw, 48px);
+      border-top: 4px solid var(--green);
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .role-card.nope { border-top-color: #a7aaa5; }
+
+    .role-card ul,
+    .plain-list {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .role-card li,
+    .plain-list li {
+      position: relative;
+      padding: 10px 0 10px 23px;
+      color: #454b46;
+      border-bottom: 1px solid #e4dfd5;
+      font-size: clamp(14px, 1.3vw, 20px);
+      line-height: 1.45;
+    }
+
+    .role-card li::before,
+    .plain-list li::before {
+      content: "";
+      position: absolute;
+      left: 1px;
+      top: 20px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(10px, 1.4vw, 22px);
+      max-width: 1240px;
+    }
+
+    .flow-item {
+      min-height: clamp(220px, 34vh, 390px);
+      padding: clamp(20px, 2.4vw, 36px);
+      border: 1px solid var(--line);
+      background: rgba(255,253,248,0.6);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .flow-item:nth-child(2),
+    .flow-item:nth-child(4) { background: var(--white); }
+
+    .flow-number {
+      margin-bottom: auto;
+      color: var(--orange);
+      font-size: clamp(24px, 3vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .flow-item h3 { font-size: clamp(18px, 1.8vw, 27px); }
+    .flow-item p { color: var(--muted); font-size: clamp(12px, 1.05vw, 16px); }
+
+    .phone-stage {
+      display: grid;
+      grid-template-columns: minmax(270px, 0.9fr) minmax(300px, 1.2fr);
+      gap: clamp(36px, 7vw, 110px);
+      align-items: center;
+      max-width: 1120px;
+    }
+
+    .phone {
+      width: min(100%, 360px);
+      min-height: clamp(370px, 54vh, 610px);
+      margin: 0 auto;
+      padding: 14px;
+      border: 8px solid #252a27;
+      border-radius: 38px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .phone-inner {
+      height: 100%;
+      padding: clamp(22px, 3vh, 38px) 19px 18px;
+      border-radius: 24px;
+      background: #f8f5ed;
+      overflow: hidden;
+    }
+
+    .phone-kicker {
+      margin-bottom: clamp(26px, 5vh, 52px);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .phone-question {
+      margin-bottom: 24px;
+      font-family: var(--serif);
+      font-size: clamp(21px, 2.2vw, 31px);
+      line-height: 1.45;
+    }
+
+    .choice {
+      margin: 8px 0;
+      padding: 12px 14px;
+      border: 1px solid #d9d3c8;
+      border-radius: 12px;
+      background: var(--white);
+      color: #4b514c;
+      font-size: clamp(12px, 1vw, 14px);
+    }
+
+    .choice.selected {
+      color: var(--green);
+      border-color: var(--green);
+      background: var(--green-soft);
+      font-weight: 750;
+    }
+
+    .phone-button {
+      margin-top: 18px;
+      padding: 13px;
+      border-radius: 12px;
+      color: var(--white);
+      background: var(--green);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .feature-copy .mini-point {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 14px;
+      margin: 18px 0;
+      align-items: start;
+    }
+
+    .mini-point strong {
+      display: inline-flex;
+      width: 26px;
+      height: 26px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: var(--white);
+      background: var(--orange);
+      font-size: 12px;
+    }
+
+    .mini-point p { color: #48504a; font-size: clamp(15px, 1.4vw, 21px); }
+
+    .response-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .response-chip {
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--white);
+      color: var(--green);
+      font-size: clamp(12px, 1.1vw, 16px);
+      font-weight: 700;
+    }
+
+    .scope-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: clamp(24px, 5vw, 72px);
+      max-width: 1150px;
+    }
+
+    .scope-column {
+      padding: clamp(25px, 3.5vw, 48px);
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .scope-column.later { background: transparent; }
+
+    .scope-column h3 {
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--green);
+    }
+
+    .scope-column.later h3 { border-bottom-color: var(--line); }
+
+    .scope-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 18px;
+      margin-top: 22px;
+    }
+
+    .scope-item {
+      padding: 13px 0;
+      border-bottom: 1px solid #e2ddd3;
+      font-size: clamp(14px, 1.2vw, 18px);
+      font-weight: 680;
+    }
+
+    .later .scope-list { grid-template-columns: 1fr; }
+    .later .scope-item { color: var(--muted); font-weight: 520; }
+
+    .metric-stage {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: clamp(30px, 6vw, 90px);
+      align-items: center;
+      max-width: 1160px;
+    }
+
+    .north-star {
+      aspect-ratio: 1;
+      width: min(100%, 380px);
+      padding: clamp(26px, 4vw, 54px);
+      border-radius: 50%;
+      color: var(--white);
+      background: var(--green);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: var(--shadow);
+    }
+
+    .north-star small {
+      margin-bottom: 16px;
+      color: #bcd0c7;
+      font-size: clamp(10px, 1vw, 14px);
+      font-weight: 800;
+      letter-spacing: 0.12em;
+    }
+
+    .north-star p {
+      font-size: clamp(20px, 2.1vw, 32px);
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .metric-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 28px;
+    }
+
+    .metric {
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .metric b {
+      display: block;
+      margin-bottom: 5px;
+      font-size: clamp(16px, 1.4vw, 21px);
+    }
+
+    .metric span { color: var(--muted); font-size: clamp(11px, 1vw, 14px); }
+
+    .safety-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(14px, 2vw, 28px);
+      max-width: 1180px;
+    }
+
+    .safety-card {
+      min-height: clamp(200px, 30vh, 340px);
+      padding: clamp(23px, 3vw, 42px);
+      border: 1px solid var(--line);
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .safety-card .icon {
+      width: 42px;
+      height: 42px;
+      margin-bottom: auto;
+      border: 2px solid var(--orange);
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .safety-card .icon::after {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 11px;
+      width: 16px;
+      height: 9px;
+      border-left: 2px solid var(--orange);
+      border-bottom: 2px solid var(--orange);
+      transform: rotate(-45deg);
+    }
+
+    .safety-card p { color: var(--muted); font-size: clamp(13px, 1.15vw, 17px); }
+
+    .business {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(20px, 4vw, 58px);
+      max-width: 1120px;
+    }
+
+    .plan-card {
+      min-height: clamp(250px, 38vh, 430px);
+      padding: clamp(28px, 4vw, 52px);
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .plan-card.premium {
+      color: var(--white);
+      border-color: var(--green);
+      background: var(--green);
+    }
+
+    .plan-card p {
+      color: var(--muted);
+      font-size: clamp(13px, 1.15vw, 17px);
+    }
+
+    .plan-card.premium p { color: #c3d2cc; }
+    .plan-card .plain-list li { color: inherit; border-bottom-color: rgba(120,120,120,0.22); }
+    .plan-card.premium .plain-list li { border-bottom-color: rgba(255,255,255,0.16); }
+
+    .vision-stage {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+      gap: clamp(36px, 7vw, 110px);
+      align-items: center;
+      max-width: 1160px;
+    }
+
+    .relationship-map {
+      min-height: 330px;
+      position: relative;
+    }
+
+    .relation-node {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--white);
+      box-shadow: 0 8px 30px rgba(48,43,35,0.08);
+      font-size: clamp(13px, 1.15vw, 17px);
+      font-weight: 700;
+    }
+
+    .relation-node.center {
+      width: 140px;
+      height: 140px;
+      left: calc(50% - 70px);
+      top: calc(50% - 70px);
+      color: var(--white);
+      border-color: var(--green);
+      background: var(--green);
+      font-size: 21px;
+    }
+
+    .relation-node.a { width: 94px; height: 94px; left: 4%; top: 8%; }
+    .relation-node.b { width: 104px; height: 104px; right: 2%; top: 4%; }
+    .relation-node.c { width: 92px; height: 92px; left: 2%; bottom: 4%; }
+    .relation-node.d { width: 96px; height: 96px; right: 5%; bottom: 5%; }
+
+    .relation-line {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 42%;
+      height: 1px;
+      background: var(--line);
+      transform-origin: left center;
+      z-index: -1;
+    }
+
+    .relation-line.l1 { transform: rotate(213deg); }
+    .relation-line.l2 { transform: rotate(324deg); }
+    .relation-line.l3 { transform: rotate(148deg); }
+    .relation-line.l4 { transform: rotate(35deg); }
+
+    .closing .slide-body { align-items: flex-start; }
+
+    .closing-copy {
+      max-width: 1000px;
+      margin-bottom: clamp(34px, 6vh, 72px);
+      font-family: var(--serif);
+      font-size: clamp(36px, 5.3vw, 82px);
+      line-height: 1.35;
+      letter-spacing: -0.055em;
+    }
+
+    .closing-small {
+      color: var(--green);
+      font-size: clamp(17px, 1.6vw, 24px);
+      font-weight: 750;
+    }
+
+    .navigation {
+      position: fixed;
+      left: clamp(20px, 3vw, 48px);
+      right: clamp(20px, 3vw, 48px);
+      bottom: clamp(16px, 2.5vh, 30px);
+      z-index: 50;
+      display: grid;
+      grid-template-columns: 92px 1fr 92px;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .nav-button {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1px solid rgba(32,37,34,0.2);
+      border-radius: 50%;
+      color: var(--ink);
+      background: rgba(255,253,248,0.82);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      transition: background 180ms ease, transform 180ms ease, opacity 180ms ease;
+    }
+
+    .nav-button:hover { background: var(--white); transform: translateY(-2px); }
+    .nav-button:disabled { opacity: 0.25; cursor: default; transform: none; }
+    #nextBtn { justify-self: end; }
+
+    .progress-track {
+      height: 2px;
+      background: rgba(32,37,34,0.16);
+      position: relative;
+    }
+
+    .progress-bar {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 0;
+      background: var(--orange);
+      transition: width 300ms ease;
+    }
+
+    .counter {
+      position: fixed;
+      right: clamp(28px, 7vw, 110px);
+      top: clamp(28px, 5vw, 78px);
+      z-index: 20;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(10px, 0.9vw, 13px);
+      letter-spacing: 0.08em;
+    }
+
+    .help {
+      position: fixed;
+      right: clamp(20px, 3vw, 48px);
+      bottom: clamp(67px, 9vh, 86px);
+      z-index: 60;
+      max-width: 250px;
+      padding: 11px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: #5c625d;
+      background: rgba(255,253,248,0.92);
+      font-size: 11px;
+      line-height: 1.55;
+      box-shadow: 0 8px 30px rgba(48,43,35,0.08);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .help.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 820px) {
+      .slide {
+        overflow-y: auto;
+        padding: 24px 24px 82px;
+        gap: 24px;
+      }
+
+      .slide-head { padding-right: 42px; }
+      .slide-body { justify-content: flex-start; padding-top: 5vh; }
+      .counter { right: 24px; top: 26px; }
+
+      .quote-stage,
+      .chat-pair,
+      .rewrite,
+      .phone-stage,
+      .metric-stage,
+      .vision-stage { grid-template-columns: 1fr; }
+
+      .quote-stage .arrow-line { width: 1px; height: 40px; margin-left: 16px; }
+      .quote-stage .arrow-line::after { right: -4px; top: auto; bottom: 0; transform: rotate(135deg); }
+      .chat-pair { gap: 30px; }
+      .thought { margin-left: 10px; }
+      .three-step, .compare-grid, .flow, .safety-grid { grid-template-columns: 1fr; }
+      .step-card + .step-card { border-left: 0; }
+      .role-grid, .business, .scope-grid { grid-template-columns: 1fr; }
+      .rewrite-arrow { transform: rotate(90deg); }
+      .scope-list, .metric-list { grid-template-columns: 1fr; }
+      .phone { min-height: 500px; }
+      .relationship-map { min-height: 300px; }
+      .navigation { grid-template-columns: 56px 1fr 56px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; }
+    }
+
+    @media print {
+      html, body { overflow: visible; background: white; }
+      .deck { height: auto; }
+      .slide {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        page-break-after: always;
+      }
+      .navigation, .counter, .help { display: none !important; }
+    }
+
+    /* ──────────────────────────────────────────────
+       Design revision 02 — editorial presentation
+       ────────────────────────────────────────────── */
+    :root {
+      --paper: #f6f3ea;
+      --paper-2: #ece8dc;
+      --ink: #171b18;
+      --muted: #70726b;
+      --line: #bbb8ad;
+      --green: #173d33;
+      --green-soft: #d9e2dc;
+      --orange: #ef5b3e;
+      --orange-soft: #f3ddd5;
+      --white: #fffdf7;
+      --shadow: none;
+      --sans: "Noto Sans KR", "Pretendard", "SUIT", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      --serif: "Gowun Batang", "Noto Serif KR", "KoPub Batang", serif;
+    }
+
+    html, body {
+      background: #191c19;
+    }
+
+    .deck {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: min(100vw, calc(100vh * 16 / 9));
+      height: min(100vh, calc(100vw * 9 / 16));
+      transform: translate(-50%, -50%);
+      overflow: hidden;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.28);
+    }
+
+    .deck::after {
+      box-shadow: inset 0 0 110px rgba(21, 24, 21, 0.025);
+    }
+
+    .slide {
+      gap: clamp(12px, 2vh, 28px);
+      padding: clamp(30px, 4.6vw, 72px) clamp(38px, 6.2vw, 104px) clamp(56px, 6vh, 82px);
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: clamp(38px, 6.2vw, 104px);
+      width: clamp(46px, 4.5vw, 72px);
+      height: 7px;
+      background: var(--orange);
+    }
+
+    .slide::after {
+      content: attr(data-title);
+      position: absolute;
+      right: 4.6%;
+      bottom: 1.2%;
+      z-index: -1;
+      color: var(--ink);
+      opacity: 0.028;
+      font-size: clamp(72px, 11vw, 176px);
+      font-weight: 900;
+      line-height: 0.85;
+      letter-spacing: -0.08em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .slide-head,
+    .slide-foot {
+      position: relative;
+      z-index: 3;
+      font-size: clamp(9px, 0.72vw, 12px);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+    }
+
+    .slide-head { align-items: flex-start; }
+
+    .brand {
+      font-size: clamp(13px, 1vw, 17px);
+      font-weight: 900;
+      letter-spacing: -0.045em;
+    }
+
+    .slide-foot {
+      padding-top: 12px;
+      border-top: 1px solid rgba(23, 27, 24, 0.16);
+    }
+
+    .slide-body {
+      position: relative;
+      z-index: 2;
+    }
+
+    .eyebrow {
+      margin-bottom: clamp(13px, 1.4vh, 20px);
+      font-size: clamp(10px, 0.75vw, 13px);
+      font-weight: 900;
+      letter-spacing: 0.18em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(64px, 10.4vw, 164px);
+      line-height: 0.84;
+      font-weight: 900;
+      letter-spacing: -0.085em;
+    }
+
+    h2 {
+      margin-bottom: clamp(22px, 3.4vh, 44px);
+      max-width: 1050px;
+      font-size: clamp(32px, 4.55vw, 72px);
+      line-height: 1.14;
+      font-weight: 800;
+      letter-spacing: -0.06em;
+    }
+
+    h3 {
+      font-weight: 800;
+      letter-spacing: -0.045em;
+    }
+
+    p { letter-spacing: -0.035em; }
+
+    .lead {
+      font-size: clamp(18px, 1.9vw, 30px);
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .pill {
+      min-height: 30px;
+      padding: 6px 12px;
+      border-color: rgba(246, 243, 234, 0.4);
+      border-radius: 2px;
+      background: transparent;
+      color: rgba(246, 243, 234, 0.68);
+      font-size: clamp(9px, 0.7vw, 12px);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .cover {
+      color: var(--paper);
+      background: var(--green);
+    }
+
+    .cover::before {
+      left: 0;
+      width: 31%;
+      height: 9px;
+    }
+
+    .cover::after {
+      content: "R";
+      right: -1.5%;
+      bottom: -13%;
+      color: var(--paper);
+      opacity: 0.035;
+      font-family: var(--serif);
+      font-size: min(69vh, 62vw);
+      font-weight: 400;
+    }
+
+    .cover .slide-head,
+    .cover .slide-foot { color: rgba(246, 243, 234, 0.56); }
+    .cover .slide-foot { border-top-color: rgba(246, 243, 234, 0.18); }
+    .cover h1 { color: var(--paper); }
+    .cover h1::first-letter { color: var(--orange); }
+    .cover .lead { color: rgba(246, 243, 234, 0.82); }
+    .cover .rule { width: 42px; height: 5px; margin: 9px 0 25px; }
+
+    .cover-title-wrap {
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .cover-mark {
+      width: 12px;
+      height: 12px;
+      margin: 6px 0 0 1px;
+      border: 0;
+      border-radius: 0;
+      background: var(--orange);
+      transform: rotate(45deg);
+    }
+
+    .cover-mark::before,
+    .cover-mark::after { display: none; }
+
+    .cover-sub {
+      margin: 24px 0 18px;
+      color: var(--paper);
+      font-family: var(--serif);
+      font-size: clamp(22px, 2.7vw, 43px);
+      font-weight: 400;
+      letter-spacing: -0.055em;
+    }
+
+    .cover-meta { margin-top: 26px !important; }
+
+    .quote-stage {
+      grid-template-columns: 1.12fr 90px 0.88fr;
+      gap: clamp(26px, 4vw, 64px);
+      padding: 6.2vh 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .quote-big {
+      font-size: clamp(33px, 4.2vw, 66px);
+      line-height: 1.42;
+      font-weight: 700;
+    }
+
+    .arrow-line { background: var(--orange); }
+
+    .chat-pair {
+      grid-template-columns: 0.78fr 1.22fr;
+      max-width: 1180px;
+      gap: clamp(44px, 8vw, 126px);
+    }
+
+    .bubble-wrap {
+      padding: 4.5vh 0;
+      gap: 14px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .bubble {
+      padding: clamp(13px, 1.4vw, 22px) clamp(15px, 1.8vw, 28px);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      box-shadow: none;
+      font-size: clamp(17px, 1.7vw, 27px);
+      font-weight: 600;
+    }
+
+    .bubble.reply {
+      border-radius: 2px;
+      border-color: var(--green);
+    }
+
+    .thought {
+      padding: 2vh 0 2vh clamp(26px, 3.2vw, 52px);
+      border-left-width: 7px;
+    }
+
+    .thought p:last-child {
+      font-size: clamp(29px, 3.3vw, 52px);
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .three-step {
+      max-width: 1210px;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .step-card {
+      min-height: clamp(190px, 28vh, 330px);
+      padding: clamp(20px, 2.6vw, 40px);
+      border: 0;
+      background: transparent !important;
+    }
+
+    .step-card + .step-card { border-left: 1px solid var(--line); }
+
+    .step-num {
+      margin-bottom: auto;
+      color: var(--orange);
+      font-size: clamp(10px, 0.72vw, 12px);
+      letter-spacing: 0.14em;
+    }
+
+    .step-card {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .step-card p {
+      font-size: clamp(20px, 2.1vw, 33px);
+      font-weight: 750;
+      line-height: 1.5;
+    }
+
+    [data-title="How conflict grows"] .step-card:nth-child(3) {
+      color: var(--paper);
+      background: var(--green) !important;
+    }
+
+    [data-title="How conflict grows"] .step-card:nth-child(3) .step-num { color: #92b0a4; }
+
+    .insight-box {
+      padding: clamp(28px, 4.6vw, 70px) clamp(28px, 5vw, 76px);
+      border: 0;
+      border-left: 9px solid var(--orange);
+      background: var(--white);
+      box-shadow: none;
+    }
+
+    .insight-box p {
+      font-size: clamp(25px, 3vw, 48px);
+      font-weight: 700;
+      line-height: 1.58;
+    }
+
+    .compare-grid {
+      grid-template-columns: 0.8fr 0.8fr 1.4fr;
+      gap: 0;
+      max-width: 1210px;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .compare-card {
+      min-height: clamp(210px, 30vh, 350px);
+      padding: clamp(21px, 2.6vw, 40px);
+      border: 0;
+      background: transparent;
+    }
+
+    .compare-card + .compare-card { border-left: 1px solid var(--line); }
+
+    .compare-card.ours {
+      border-color: var(--green);
+      background: var(--green);
+    }
+
+    .compare-label {
+      color: var(--orange);
+      font-size: clamp(10px, 0.78vw, 13px);
+      letter-spacing: 0.14em;
+    }
+
+    .compare-card.ours .compare-label { color: #9bb4aa; }
+    .compare-card h3 { font-size: clamp(21px, 2.05vw, 32px); }
+
+    .statement {
+      width: 100%;
+      max-width: 1180px;
+      gap: 0;
+      border-top: 1px solid var(--ink);
+    }
+
+    .statement-line {
+      min-height: clamp(86px, 12vh, 138px);
+      padding: clamp(14px, 2vh, 26px) 0;
+      border-bottom: 1px solid var(--line);
+      font-size: clamp(27px, 3.25vw, 52px);
+    }
+
+    .statement-line .no {
+      min-width: clamp(120px, 16vw, 250px);
+      font-size: clamp(10px, 0.75vw, 13px);
+      font-weight: 900;
+    }
+
+    .statement-line:last-child {
+      margin: 0;
+      padding-top: clamp(14px, 2vh, 26px);
+      border-top: 0;
+      border-bottom: 5px solid var(--green);
+    }
+
+    .rewrite {
+      grid-template-columns: 0.86fr 32px 1.14fr;
+      gap: clamp(16px, 2.1vw, 32px);
+      max-width: 1190px;
+    }
+
+    .rewrite-card {
+      min-height: clamp(220px, 31vh, 365px);
+      padding: clamp(22px, 2.7vw, 42px);
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .rewrite-card.bad {
+      border: 1px solid var(--line);
+      background: transparent;
+      opacity: 0.72;
+    }
+
+    .rewrite-card.good {
+      color: var(--paper);
+      border: 0;
+      border-left: 8px solid var(--orange);
+      background: var(--green);
+    }
+
+    .rewrite-tag {
+      padding: 5px 8px;
+      border-radius: 1px;
+      font-size: clamp(9px, 0.67vw, 11px);
+      letter-spacing: 0.08em;
+    }
+
+    .rewrite-card.good .rewrite-tag {
+      color: var(--paper);
+      background: rgba(255,255,255,0.12);
+    }
+
+    .rewrite-card blockquote {
+      font-size: clamp(19px, 2.15vw, 34px);
+      font-weight: 700;
+      line-height: 1.65;
+    }
+
+    .rewrite-card.good small { color: rgba(246,243,234,0.62); }
+    .rewrite-arrow { font-size: 24px; }
+
+    .role-grid {
+      gap: 0;
+      max-width: 1160px;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .role-card {
+      padding: clamp(22px, 3vw, 46px);
+      border: 0;
+      border-left: 7px solid var(--orange);
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .role-card.nope {
+      color: var(--paper);
+      border-left: 0;
+      background: var(--green);
+    }
+
+    .role-card.nope h3 { color: #b7c8c1; }
+    .role-card.nope li { color: rgba(246,243,234,0.78); border-bottom-color: rgba(255,255,255,0.15); }
+    .role-card li::before { border-radius: 0; }
+
+    .flow {
+      gap: 0;
+      max-width: 1230px;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .flow-item,
+    .flow-item:nth-child(2),
+    .flow-item:nth-child(4) {
+      min-height: clamp(215px, 31vh, 360px);
+      padding: clamp(20px, 2.3vw, 34px);
+      border: 0;
+      background: transparent;
+    }
+
+    .flow-item + .flow-item { border-left: 1px solid var(--line); }
+    .flow-item:nth-child(4) { color: var(--paper); background: var(--green); }
+    .flow-item:nth-child(4) p { color: #b8c8c1; }
+
+    .flow-number {
+      color: var(--orange);
+      font-size: clamp(34px, 4vw, 62px);
+      line-height: 1;
+      font-weight: 400;
+      font-family: var(--serif);
+    }
+
+    .phone-stage {
+      grid-template-columns: minmax(300px, 0.9fr) minmax(380px, 1.1fr);
+      gap: clamp(48px, 7vw, 110px);
+      max-width: 1140px;
+    }
+
+    .phone {
+      width: min(100%, 410px);
+      min-height: clamp(360px, 51vh, 575px);
+      padding: 0;
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      background: var(--white);
+      box-shadow: 18px 18px 0 var(--paper-2);
+    }
+
+    .phone::before {
+      content: "MIND CHECK / 01";
+      display: block;
+      padding: 10px 16px;
+      color: var(--paper);
+      background: var(--green);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+    }
+
+    .phone-inner {
+      padding: clamp(23px, 3vh, 38px) clamp(20px, 2vw, 30px);
+      border-radius: 0;
+      background: var(--white);
+    }
+
+    .phone-kicker {
+      margin-bottom: clamp(24px, 4vh, 44px);
+      color: var(--orange);
+      font-size: 10px;
+      letter-spacing: 0.09em;
+    }
+
+    .phone-question {
+      font-size: clamp(20px, 2vw, 30px);
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .choice {
+      margin: 6px 0;
+      padding: 10px 12px;
+      border-radius: 0;
+      background: transparent;
+      font-size: clamp(10px, 0.85vw, 13px);
+    }
+
+    .choice.selected { border-left: 5px solid var(--orange); background: var(--green-soft); }
+    .phone-button { border-radius: 0; font-size: 11px; letter-spacing: 0.1em; }
+
+    .mini-point {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mini-point strong { border-radius: 1px; background: var(--green); }
+
+    .response-chip {
+      padding: 10px 14px;
+      border-radius: 1px;
+      font-size: clamp(10px, 0.9vw, 14px);
+    }
+
+    .scope-grid {
+      grid-template-columns: 1.32fr 0.68fr;
+      gap: 0;
+      max-width: 1160px;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .scope-column {
+      padding: clamp(24px, 3vw, 46px);
+      border: 0;
+      border-left: 7px solid var(--orange);
+      background: transparent;
+    }
+
+    .scope-column.later {
+      border-left: 1px solid var(--line);
+      background: var(--paper-2);
+    }
+
+    .scope-column h3,
+    .scope-column.later h3 {
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .metric-stage {
+      grid-template-columns: 0.9fr 1.1fr;
+      max-width: 1160px;
+      gap: clamp(42px, 6vw, 90px);
+    }
+
+    .north-star {
+      aspect-ratio: auto;
+      width: 100%;
+      min-height: clamp(220px, 31vh, 350px);
+      padding: clamp(28px, 4vw, 58px);
+      border: 0;
+      border-left: 9px solid var(--orange);
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .north-star small { color: #a9bdb5; }
+    .metric { padding: clamp(10px, 1.5vh, 18px) 0; }
+
+    .safety-grid {
+      gap: 0;
+      max-width: 1190px;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .safety-card {
+      min-height: clamp(190px, 28vh, 320px);
+      padding: clamp(22px, 2.8vw, 42px);
+      border: 0;
+      background: transparent;
+    }
+
+    .safety-card + .safety-card { border-left: 1px solid var(--line); }
+    .safety-card .icon { display: none; }
+
+    .safety-card::before {
+      display: block;
+      margin-bottom: auto;
+      color: var(--orange);
+      font-family: var(--serif);
+      font-size: clamp(30px, 3vw, 46px);
+    }
+
+    .safety-card:nth-child(1)::before { content: "01"; }
+    .safety-card:nth-child(2)::before { content: "02"; }
+    .safety-card:nth-child(3)::before { content: "03"; }
+
+    .business {
+      gap: 0;
+      max-width: 1140px;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .plan-card {
+      min-height: clamp(245px, 36vh, 410px);
+      padding: clamp(26px, 3.6vw, 54px);
+      border: 0;
+      border-left: 7px solid var(--orange);
+      background: transparent;
+    }
+
+    .plan-card.premium {
+      border-left: 0;
+      background: var(--green);
+    }
+
+    .relationship-map { min-height: clamp(280px, 41vh, 450px); }
+
+    .relation-node {
+      border-radius: 0;
+      box-shadow: none;
+      font-size: clamp(11px, 0.95vw, 14px);
+      letter-spacing: 0.06em;
+    }
+
+    .relation-node.center {
+      width: 150px;
+      height: 150px;
+      left: calc(50% - 75px);
+      top: calc(50% - 75px);
+      border-left: 7px solid var(--orange);
+      border-radius: 0;
+      font-size: 19px;
+    }
+
+    .relation-node.a,
+    .relation-node.b,
+    .relation-node.c,
+    .relation-node.d { width: 88px; height: 58px; border-color: var(--ink); }
+
+    .closing {
+      color: var(--paper);
+      background: var(--green);
+    }
+
+    .closing::before { left: 0; width: 31%; height: 9px; }
+    .closing::after { color: var(--paper); opacity: 0.025; }
+    .closing .slide-head, .closing .slide-foot { color: rgba(246,243,234,0.56); }
+    .closing .slide-foot { border-top-color: rgba(246,243,234,0.18); }
+    .closing-copy { font-weight: 700; }
+    .closing-copy .green { color: #f59077; }
+    .closing-small { color: #c4d4cd; }
+
+    .navigation {
+      position: absolute;
+      left: clamp(22px, 2.6vw, 42px);
+      right: clamp(22px, 2.6vw, 42px);
+      bottom: clamp(14px, 1.8vh, 24px);
+      grid-template-columns: 54px 1fr 54px;
+      gap: 12px;
+    }
+
+    .nav-button {
+      width: 38px;
+      height: 38px;
+      border-color: rgba(23,27,24,0.24);
+      border-radius: 1px;
+      background: rgba(246,243,234,0.9);
+      font-weight: 800;
+      backdrop-filter: none;
+    }
+
+    .progress-track { height: 1px; }
+    .progress-bar { height: 3px; top: -1px; }
+
+    .counter {
+      position: absolute;
+      right: clamp(38px, 6.2vw, 104px);
+      top: clamp(30px, 4.6vw, 72px);
+      font-size: clamp(9px, 0.7vw, 11px);
+      font-weight: 800;
+    }
+
+    .help {
+      position: absolute;
+      right: clamp(22px, 2.6vw, 42px);
+      bottom: clamp(61px, 7vh, 78px);
+      border-radius: 1px;
+      box-shadow: none;
+    }
+
+    @media (max-width: 820px) {
+      html, body { background: var(--paper); }
+      .deck {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        transform: none;
+        box-shadow: none;
+      }
+      .slide { padding: 25px 24px 82px; }
+      .slide::before { left: 24px; }
+      .slide::after { display: none; }
+      .quote-stage { grid-template-columns: 1fr; }
+      .compare-grid,
+      .three-step,
+      .flow,
+      .safety-grid { border-bottom: 0; }
+      .step-card + .step-card,
+      .compare-card + .compare-card,
+      .flow-item + .flow-item,
+      .safety-card + .safety-card { border-left: 0; border-top: 1px solid var(--line); }
+      .role-grid,
+      .scope-grid,
+      .business { border-bottom: 0; }
+      .phone-stage { grid-template-columns: 1fr; }
+      .phone { min-height: 500px; }
+      .counter { right: 24px; top: 25px; }
+    }
+
+    @media print {
+      html, body { background: white; }
+      .deck {
+        position: static;
+        width: auto;
+        height: auto;
+        transform: none;
+        overflow: visible;
+        box-shadow: none;
+      }
+      .slide { width: 100vw; height: 56.25vw; min-height: 100vh; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" id="deck" aria-live="polite">
+    <section class="slide cover active" data-title="Cover" aria-hidden="false">
+      <header class="slide-head"><span>Product Plan</span><span>Draft v0.1</span></header>
+      <div class="slide-body">
+        <div class="cover-title-wrap">
+          <h1>Re:Mind</h1>
+          <div class="cover-mark" aria-hidden="true"></div>
+        </div>
+        <p class="cover-sub"><span class="line">마음과 마음 사이,</span><span class="line">대화가 다시 이어지도록.</span></p>
+        <hr class="rule" />
+        <p class="lead">내 감정을 이해하고, 나다운 말로 상대에게 전하도록 돕는 관계 대화 서비스</p>
+        <div class="cover-meta" style="margin-top:32px">
+          <span class="pill">AI 기반 관계 대화 서비스</span>
+          <span class="pill">2026.08</span>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>Re:Mind</span><span>01</span></footer>
+    </section>
+
+    <section class="slide" data-title="How it works" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>How it works</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">Re:Mind는 이렇게 작동합니다</p>
+        <h2><span class="line">한 사람의 마음 정리에서</span><span class="line">둘의 대화까지.</span></h2>
+        <div class="flow">
+          <article class="flow-item"><span class="flow-number">01</span><div><h3>마음을 적는다</h3><p>싸운 뒤, 하고 싶었던 말을 꺼낸다.</p></div></article>
+          <article class="flow-item"><span class="flow-number">02</span><div><h3>질문으로 정리한다</h3><p>AI가 감정과 바람을 확인하도록 돕는다.</p></div></article>
+          <article class="flow-item"><span class="flow-number">03</span><div><h3>마음을 전한다</h3><p>내 마음이 잘 담겼는지 읽어보고 상대에게 보낸다.</p></div></article>
+          <article class="flow-item"><span class="flow-number">04</span><div><h3>각자의 마음으로 답한다</h3><p>상대도 바로 답하지 않고 마음부터 정리한다.</p></div></article>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>01 / How it works</span><span>02</span></footer>
+    </section>
+
+    <section class="slide" data-title="Problem" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Problem</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">메신저에서 벌어지는 일</p>
+        <h2><span class="line">감정보다 표현이</span><span class="line">먼저 도착한다.</span></h2>
+        <div class="chat-pair">
+          <div class="bubble-wrap">
+            <span class="bubble-note">늦은 저녁, 기다리던 연락이 없었을 때</span>
+            <div class="bubble">연락 한 번 하는 게 그렇게 어려워?</div>
+            <div class="bubble reply">나도 정신없었어. 꼭 그렇게 말해야 해?</div>
+            <span class="bubble-note">대화는 표현을 따라 엇나간다</span>
+          </div>
+          <div class="thought">
+            <p>정작 하고 싶었던 말</p>
+            <p>“연락을 기다리는 동안, 내가 중요하지 않은 사람처럼 느껴져서 서운했어.”</p>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>02 / Problem</span><span>03</span></footer>
+    </section>
+
+    <section class="slide" data-title="How conflict grows" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Problem</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">갈등이 커지는 구조</p>
+        <h2><span class="line">마음은 뒤에 남고,</span><span class="line">날카로운 말만 기억된다.</span></h2>
+        <div class="three-step">
+          <article class="step-card">
+            <span class="step-num">01 · 마음</span>
+            <p>서운함<br />외로움<br />불안함</p>
+          </article>
+          <article class="step-card">
+            <span class="step-num">02 · 표현</span>
+            <p>“맨날”<br />“됐어”<br />“마음대로 해”</p>
+          </article>
+          <article class="step-card">
+            <span class="step-num">03 · 반응</span>
+            <p>방어하고<br />반격하고<br />대화를 닫는다</p>
+          </article>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>02 / Problem</span><span>04</span></footer>
+    </section>
+
+    <section class="slide" data-title="Insight" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Insight</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">우리가 주목한 것</p>
+        <div class="insight-box">
+          <p>많은 관계에서 갈등 자체보다, <span class="accent">내 마음과 의도가 제대로 닿지 않았다는 경험</span>이 두 사람의 거리를 키운다.</p>
+        </div>
+        <p class="muted" style="margin-top:26px">그래서 갈등을 판정하는 대신, 이해가 시작될 틈을 만든다.</p>
+      </div>
+      <footer class="slide-foot"><span>03 / Insight</span><span>05</span></footer>
+    </section>
+
+    <section class="slide" data-title="Gap" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Market gap</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">지금의 선택지</p>
+        <h2><span class="line">기록하거나, 혼자 상담하거나.</span><span class="line">둘이 다시 말하게 만드는</span><span class="line">경험은 드물다.</span></h2>
+        <div class="compare-grid">
+          <article class="compare-card">
+            <span class="compare-label">커플 앱</span>
+            <div><h3>관계를 기록한다</h3><p>일정 · 기념일 · 사진 · 채팅</p></div>
+          </article>
+          <article class="compare-card">
+            <span class="compare-label">AI 상담</span>
+            <div><h3>혼자 마음을 푼다</h3><p>사용자와 AI의 1:1 대화</p></div>
+          </article>
+          <article class="compare-card ours">
+            <span class="compare-label">Re:Mind</span>
+            <div><h3>둘의 대화를 잇는다</h3><p>각자의 마음을 정리한 뒤 서로에게 전달</p></div>
+          </article>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>04 / Gap</span><span>06</span></footer>
+    </section>
+
+    <section class="slide" data-title="Solution" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Solution</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">Re:Mind가 하는 일</p>
+        <div class="statement">
+          <div class="statement-line"><span class="no">판단하지 않고</span><span>누가 맞는지 정하지 않는다.</span></div>
+          <div class="statement-line"><span class="no">설득하지 않고</span><span>관계를 유지하라 말하지 않는다.</span></div>
+          <div class="statement-line"><span class="no">대신</span><span>서로 이해할 수 있는 대화를 설계한다.</span></div>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>05 / Solution</span><span>07</span></footer>
+    </section>
+
+    <section class="slide" data-title="Human first" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Human first</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">가장 중요한 제품 원칙</p>
+        <h2><span class="line">AI가 대신 쓰지 않는다.</span><span class="line green">사람의 말을</span><span class="line green">찾도록 돕는다.</span></h2>
+        <div class="rewrite">
+          <article class="rewrite-card bad">
+            <span class="rewrite-tag">과하게 보정된 말</span>
+            <blockquote>“당신과의 관계를 소중히 여기기에 깊은 외로움과 서운함을 느꼈습니다.”</blockquote>
+            <small>매끈하지만, 평소의 내 말처럼 들리지 않는다.</small>
+          </article>
+          <div class="rewrite-arrow" aria-hidden="true">→</div>
+          <article class="rewrite-card good">
+            <span class="rewrite-tag">내 말에 가까운 표현</span>
+            <blockquote>“연락이 없을 때 내가 별로 중요하지 않은 사람처럼 느껴져서 서운했어.”</blockquote>
+            <small>의미는 또렷하게, 말투와 감정은 그대로.</small>
+          </article>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>06 / Human first</span><span>08</span></footer>
+    </section>
+
+    <section class="slide" data-title="AI role" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Role of AI</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">AI의 자리</p>
+        <h2><span class="line">주인공이 아니라,</span><span class="line">한 걸음 뒤의 길잡이.</span></h2>
+        <div class="role-grid">
+          <article class="role-card">
+            <h3 class="green">AI가 하는 것</h3>
+            <ul>
+              <li>마음을 돌아볼 질문을 건넨다</li>
+              <li>오해하기 쉬운 표현을 짚어준다</li>
+              <li>사용자가 고른 감정과 요청을 정리한다</li>
+              <li>말투를 유지하며 최소한으로 다듬는다</li>
+            </ul>
+          </article>
+          <article class="role-card nope">
+            <h3 class="muted">AI가 하지 않는 것</h3>
+            <ul>
+              <li>감정을 마음대로 추측하거나 단정한다</li>
+              <li>없던 사과와 용서를 만들어낸다</li>
+              <li>상담사처럼 조언하고 훈계한다</li>
+              <li>‘완벽한 편지’로 사람의 온도를 지운다</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>06 / Human first</span><span>09</span></footer>
+    </section>
+
+    <section class="slide" data-title="Core flow" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Core experience</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">하나의 대화가 만들어지는 과정</p>
+        <h2><span class="line">바로 보내지 않고,</span><span class="line">한 번 마음을 거친다.</span></h2>
+        <div class="flow">
+          <article class="flow-item"><span class="flow-number">01</span><div><h3>꺼내기</h3><p>무슨 일이 있었는지 내 말로 적는다.</p></div></article>
+          <article class="flow-item"><span class="flow-number">02</span><div><h3>발견하기</h3><p>짧은 질문으로 감정과 바람을 확인한다.</p></div></article>
+          <article class="flow-item"><span class="flow-number">03</span><div><h3>전달하기</h3><p>내 마음이 잘 담겼는지 읽어보고 상대에게 보낸다.</p></div></article>
+          <article class="flow-item"><span class="flow-number">04</span><div><h3>이해하기</h3><p>상대도 답장보다 자기 마음부터 정리한다.</p></div></article>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>07 / Core experience</span><span>10</span></footer>
+    </section>
+
+    <section class="slide" data-title="Sender experience" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Sender experience</span></header>
+      <div class="slide-body">
+        <div class="phone-stage">
+          <div class="phone" aria-label="감정 탐색 화면 예시">
+            <div class="phone-inner">
+              <div class="phone-kicker">Re:Mind · 2분이면 충분해요</div>
+              <div class="phone-question">그 순간, 가장 가까웠던 마음은 무엇이었나요?</div>
+              <div class="choice">화가 났다</div>
+              <div class="choice selected">혼자인 것 같았다</div>
+              <div class="choice">무시당한 것 같았다</div>
+              <div class="choice">내 말로 적을게요</div>
+              <div class="phone-button">다음</div>
+            </div>
+          </div>
+          <div class="feature-copy">
+            <p class="eyebrow">발신자 경험</p>
+            <h2><span class="line">질문은 짧게,</span><span class="line">선택권은 분명하게.</span></h2>
+            <div class="mini-point"><strong>1</strong><p>고정 설문이 아닌 2~5개의 맞춤 질문</p></div>
+            <div class="mini-point"><strong>2</strong><p>감정은 AI가 정답처럼 말하지 않고 사용자가 고른다</p></div>
+            <div class="mini-point"><strong>3</strong><p>보정 강도는 ‘그대로 · 조금만 · 오해만 점검’ 중 선택</p></div>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>07 / Core experience</span><span>11</span></footer>
+    </section>
+
+    <section class="slide" data-title="Receiver experience" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Receiver experience</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">수신자 경험</p>
+        <h2><span class="line">읽는 순간에도</span><span class="line">답장을 재촉하지 않는다.</span></h2>
+        <div class="insight-box" style="max-width:980px">
+          <p style="font-size:clamp(22px,2.7vw,42px)">“상대가 자신의 마음을 정리해 보낸 메시지예요. <span class="green">바로 답하지 않아도 괜찮아요.</span>”</p>
+          <div class="response-chips">
+            <span class="response-chip">읽었어요</span>
+            <span class="response-chip">생각할 시간이 필요해요</span>
+            <span class="response-chip">답장하고 싶어요</span>
+          </div>
+        </div>
+        <p class="muted" style="margin-top:24px">설치 없이 웹에서 읽고 반응한다. 앱 설치는 좋은 경험이 끝난 뒤 제안한다.</p>
+      </div>
+      <footer class="slide-foot"><span>07 / Core experience</span><span>12</span></footer>
+    </section>
+
+    <section class="slide" data-title="MVP" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>MVP</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">첫 번째 제품</p>
+        <h2><span class="line">한 번의 갈등을</span><span class="line">한 번의 안전한 대화로.</span></h2>
+        <div class="scope-grid">
+          <article class="scope-column">
+            <h3 class="green">Version 1.0에 담는 것</h3>
+            <div class="scope-list">
+              <div class="scope-item">빠른 감정 입력</div>
+              <div class="scope-item">2~5개 맞춤 질문</div>
+              <div class="scope-item">말투 보존 메시지</div>
+              <div class="scope-item">수정·확인·공유</div>
+              <div class="scope-item">웹 링크 열람</div>
+              <div class="scope-item">부담 없는 반응·답장</div>
+            </div>
+          </article>
+          <article class="scope-column later">
+            <h3 class="muted">검증 후 확장하는 것</h3>
+            <div class="scope-list">
+              <div class="scope-item">커플 계정 연결</div>
+              <div class="scope-item">갈등 히스토리</div>
+              <div class="scope-item">장기 관계 리포트</div>
+              <div class="scope-item">성장 프로그램</div>
+            </div>
+          </article>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>08 / MVP</span><span>13</span></footer>
+    </section>
+
+    <section class="slide" data-title="Hypotheses" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>What to prove</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">MVP가 답해야 할 세 가지</p>
+        <div class="three-step">
+          <article class="step-card">
+            <span class="step-num">HYPOTHESIS 01</span>
+            <p>사람은 후회할 말을 보내기 전에 Re:Mind를 열까?</p>
+          </article>
+          <article class="step-card">
+            <span class="step-num">HYPOTHESIS 02</span>
+            <p>정리된 문장이 내 마음에 더 가깝다고 느낄까?</p>
+          </article>
+          <article class="step-card">
+            <span class="step-num">HYPOTHESIS 03</span>
+            <p>상대는 부담 없이 읽고 마음을 이해할 수 있을까?</p>
+          </article>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>08 / MVP</span><span>14</span></footer>
+    </section>
+
+    <section class="slide" data-title="Metrics" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Success metric</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">많이 쓰는 앱보다, 제대로 닿는 경험</p>
+        <div class="metric-stage">
+          <div class="north-star">
+            <small>NORTH STAR</small>
+            <p>“상대의 마음을 이전보다 이해했다”고 답한 세션의 비율</p>
+          </div>
+          <div class="metric-list">
+            <div class="metric"><b>내 마음 정확도</b><span>이 문장이 정말 내 뜻인가</span></div>
+            <div class="metric"><b>발송 후 후회</b><span>보낸 뒤 지우고 싶지 않았는가</span></div>
+            <div class="metric"><b>편지 열람</b><span>상대가 부담 없이 열어봤는가</span></div>
+            <div class="metric"><b>이해의 변화</b><span>상대의 마음을 새롭게 알았는가</span></div>
+            <div class="metric"><b>대화 완주</b><span>양쪽의 마음 정리가 이어졌는가</span></div>
+            <div class="metric"><b>안전 지표</b><span>강요·신고·차단은 없었는가</span></div>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>09 / Metrics</span><span>15</span></footer>
+    </section>
+
+    <section class="slide" data-title="Safety" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Trust &amp; safety</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">관계를 다루는 제품의 기본</p>
+        <h2><span class="line">이해를 돕되,</span><span class="line">위험한 관계는</span><span class="line">중재하지 않는다.</span></h2>
+        <div class="safety-grid">
+          <article class="safety-card"><div class="icon" aria-hidden="true"></div><div><h3>대화의 동의</h3><p>답장·읽음 표시·추가 연락을 강요하지 않는다.</p></div></article>
+          <article class="safety-card"><div class="icon" aria-hidden="true"></div><div><h3>위험 상황 분리</h3><p>폭력·협박·스토킹·자해 위험에서는 중재를 멈추고 도움을 안내한다.</p></div></article>
+          <article class="safety-card"><div class="icon" aria-hidden="true"></div><div><h3>민감한 기록 보호</h3><p>링크 만료, 차단, 기록 삭제와 데이터 사용 선택권을 분명히 제공한다.</p></div></article>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>10 / Trust</span><span>16</span></footer>
+    </section>
+
+    <section class="slide" data-title="Business" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Business model</span></header>
+      <div class="slide-body">
+        <p class="eyebrow">기본 대화는 열어두고, 긴 호흡에 과금한다</p>
+        <div class="business">
+          <article class="plan-card">
+            <h2 style="font-size:clamp(30px,3.5vw,52px);margin-bottom:10px">Free</h2>
+            <p>한 번의 마음을 안전하게 전달하는 기본 경험</p>
+            <ul class="plain-list">
+              <li>감정 탐색 질문</li>
+              <li>메시지 정리·수정·공유</li>
+              <li>웹 열람과 기본 답장</li>
+            </ul>
+          </article>
+          <article class="plan-card premium">
+            <h2 style="font-size:clamp(30px,3.5vw,52px);margin-bottom:10px">Premium</h2>
+            <p>관계를 평가하는 대신, 변화를 돌아보는 기능</p>
+            <ul class="plain-list">
+              <li>개인 감정 회고와 변화 기록</li>
+              <li>사용자가 확인한 반복 패턴</li>
+              <li>관계별 대화 방식 설정</li>
+              <li>공동 회고와 대화 가이드</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>11 / Business</span><span>17</span></footer>
+    </section>
+
+    <section class="slide" data-title="Vision" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Vision</span></header>
+      <div class="slide-body">
+        <div class="vision-stage">
+          <div>
+            <p class="eyebrow">장기 비전</p>
+            <h2><span class="line">어려운 감정을</span><span class="line">안전하게 건네는 방법.</span></h2>
+            <p class="lead">연인에서 시작해, 서로를 이해하려는 모든 관계의 커뮤니케이션 플랫폼으로.</p>
+          </div>
+          <div class="relationship-map" aria-label="연인, 가족, 친구, 동료 관계 확장">
+            <span class="relation-line l1"></span><span class="relation-line l2"></span><span class="relation-line l3"></span><span class="relation-line l4"></span>
+            <span class="relation-node center">Re:Mind</span>
+            <span class="relation-node a">연인</span>
+            <span class="relation-node b">가족</span>
+            <span class="relation-node c">친구</span>
+            <span class="relation-node d">동료</span>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-foot"><span>12 / Vision</span><span>18</span></footer>
+    </section>
+
+    <section class="slide closing" data-title="Closing" aria-hidden="true">
+      <header class="slide-head"><span class="brand">Re:Mind</span><span>Closing</span></header>
+      <div class="slide-body">
+        <p class="closing-copy"><span class="line">좋은 말을 만들어주는 대신,</span><span class="line green">내 진짜 마음을 찾게 한다.</span></p>
+        <p class="closing-small">Re:Mind — 서로를 이해할 수 있는 대화를 설계합니다.</p>
+      </div>
+      <footer class="slide-foot"><span>Thank you</span><span>19</span></footer>
+    </section>
+
+    <div class="counter" id="counter" aria-label="현재 슬라이드">01 / 19</div>
+    <nav class="navigation" aria-label="슬라이드 이동">
+      <button class="nav-button" id="prevBtn" type="button" aria-label="이전 슬라이드">←</button>
+      <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+      <button class="nav-button" id="nextBtn" type="button" aria-label="다음 슬라이드">→</button>
+    </nav>
+    <div class="help" id="help">← → 키로 이동 · Home/End 처음/끝 · F 전체화면 · P 인쇄</div>
+  </main>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const progressBar = document.getElementById('progressBar');
+      const counter = document.getElementById('counter');
+      const help = document.getElementById('help');
+      let current = 0;
+      let touchStartX = 0;
+      let helpTimer;
+
+      function pad(number) { return String(number).padStart(2, '0'); }
+
+      function show(index, updateHash = true) {
+        const next = Math.max(0, Math.min(slides.length - 1, index));
+        slides.forEach((slide, i) => {
+          slide.classList.toggle('active', i === next);
+          slide.classList.toggle('previous', i < next);
+          slide.setAttribute('aria-hidden', i === next ? 'false' : 'true');
+        });
+        current = next;
+        counter.textContent = `${pad(current + 1)} / ${pad(slides.length)}`;
+        progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
+        prevBtn.disabled = current === 0;
+        nextBtn.disabled = current === slides.length - 1;
+        document.title = `Re:Mind — ${slides[current].dataset.title}`;
+        if (updateHash) history.replaceState(null, '', `#${current + 1}`);
+      }
+
+      function showHelp() {
+        help.classList.add('show');
+        clearTimeout(helpTimer);
+        helpTimer = setTimeout(() => help.classList.remove('show'), 2800);
+      }
+
+      prevBtn.addEventListener('click', () => show(current - 1));
+      nextBtn.addEventListener('click', () => show(current + 1));
+
+      document.addEventListener('keydown', async (event) => {
+        if (['ArrowRight', 'PageDown', ' '].includes(event.key)) {
+          event.preventDefault();
+          show(current + 1);
+        } else if (['ArrowLeft', 'PageUp'].includes(event.key)) {
+          event.preventDefault();
+          show(current - 1);
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          show(0);
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          show(slides.length - 1);
+        } else if (event.key.toLowerCase() === 'f') {
+          event.preventDefault();
+          if (!document.fullscreenElement) await document.documentElement.requestFullscreen?.();
+          else await document.exitFullscreen?.();
+        } else if (event.key.toLowerCase() === 'p') {
+          event.preventDefault();
+          window.print();
+        } else if (event.key === '?' || event.key.toLowerCase() === 'h') {
+          showHelp();
+        }
+      });
+
+      document.addEventListener('touchstart', (event) => {
+        touchStartX = event.changedTouches[0].screenX;
+      }, { passive: true });
+
+      document.addEventListener('touchend', (event) => {
+        const delta = event.changedTouches[0].screenX - touchStartX;
+        if (Math.abs(delta) < 55) return;
+        show(current + (delta < 0 ? 1 : -1));
+      }, { passive: true });
+
+      window.addEventListener('hashchange', () => {
+        const value = Number(location.hash.replace('#', ''));
+        if (Number.isFinite(value) && value >= 1 && value <= slides.length) show(value - 1, false);
+      });
+
+      const initial = Number(location.hash.replace('#', ''));
+      show(Number.isFinite(initial) && initial >= 1 ? initial - 1 : 0, false);
+      setTimeout(showHelp, 650);
+    })();
+  </script>
+</body>
+</html>
