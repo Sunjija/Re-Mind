@@ -1,0 +1,1437 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#173d33" />
+  <meta name="description" content="연인에게 꺼내기 어려운 마음을 내 말로 정리하고 전하는 Re:Mind 대화 세션 미리보기" />
+  <title>Re:Mind — 대화 세션 미리보기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&amp;family=Noto+Sans+KR:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f6f3ea;
+      --paper-deep: #ede8dc;
+      --surface: #fffdf8;
+      --ink: #1c2420;
+      --muted: #747871;
+      --line: #ddd8cc;
+      --green: #173d33;
+      --green-mid: #2e5a4d;
+      --green-soft: #dce6df;
+      --orange: #e96346;
+      --orange-soft: #f5ded5;
+      --yellow-soft: #f1e9cc;
+      --shadow: 0 32px 90px rgba(7, 25, 19, 0.3);
+      --sans: "Noto Sans KR", "Pretendard", "SUIT", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      --serif: "Gowun Batang", "Noto Serif KR", "KoPub Batang", serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      color: var(--ink);
+      background: var(--green);
+      font-family: var(--sans);
+      word-break: keep-all;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 16%, rgba(255,255,255,0.09), transparent 24%),
+        radial-gradient(circle at 82% 82%, rgba(233,99,70,0.14), transparent 23%),
+        var(--green);
+    }
+
+    button, textarea { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(233, 99, 70, 0.34);
+      outline-offset: 2px;
+    }
+
+    .stage {
+      width: min(1120px, calc(100% - 48px));
+      height: 100vh;
+      height: 100dvh;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(360px, 1fr) 430px;
+      align-items: center;
+      gap: clamp(54px, 8vw, 120px);
+    }
+
+    .context {
+      color: var(--paper);
+      align-self: center;
+    }
+
+    .context-brand {
+      margin-bottom: 56px;
+      color: rgba(246, 243, 234, 0.62);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+    }
+
+    .context-brand strong {
+      color: var(--paper);
+      font-size: 17px;
+      letter-spacing: -0.04em;
+    }
+
+    .context h1 {
+      max-width: 570px;
+      margin: 0 0 20px;
+      font-family: var(--serif);
+      font-size: clamp(43px, 4.3vw, 66px);
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.06em;
+      text-wrap: balance;
+    }
+
+    .context > p {
+      max-width: 510px;
+      margin: 0;
+      color: rgba(246, 243, 234, 0.67);
+      font-size: 16px;
+      line-height: 1.75;
+      letter-spacing: -0.025em;
+      text-wrap: pretty;
+    }
+
+    .journey {
+      position: relative;
+      margin-top: 54px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+    }
+
+    .journey::before {
+      content: "";
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      right: 14%;
+      height: 1px;
+      background: rgba(246, 243, 234, 0.2);
+    }
+
+    .journey-item {
+      position: relative;
+      padding-top: 26px;
+      color: rgba(246, 243, 234, 0.38);
+      font-size: 12px;
+      font-weight: 600;
+      transition: color 240ms ease;
+    }
+
+    .journey-item::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 13px;
+      height: 13px;
+      border: 1px solid rgba(246, 243, 234, 0.28);
+      border-radius: 50%;
+      background: var(--green);
+      transition: all 240ms ease;
+    }
+
+    .journey-item.active { color: var(--paper); }
+    .journey-item.active::before {
+      border-color: var(--orange);
+      background: var(--orange);
+      box-shadow: 0 0 0 5px rgba(233, 99, 70, 0.14);
+    }
+
+    .journey-item.done { color: rgba(246, 243, 234, 0.66); }
+    .journey-item.done::before {
+      border-color: rgba(246, 243, 234, 0.7);
+      background: var(--paper);
+    }
+
+    .context-note {
+      margin-top: 64px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(246, 243, 234, 0.16);
+      color: rgba(246, 243, 234, 0.45);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .phone {
+      position: relative;
+      width: 430px;
+      height: min(880px, calc(100dvh - 28px));
+      min-height: 650px;
+      overflow: hidden;
+      border: 7px solid rgba(255,255,255,0.12);
+      border-radius: 42px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .app {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+      border-radius: 34px;
+      background: var(--paper);
+    }
+
+    .app-head {
+      position: relative;
+      z-index: 20;
+      padding:
+        calc(17px + env(safe-area-inset-top))
+        22px
+        13px;
+      background: rgba(246, 243, 234, 0.94);
+      border-bottom: 1px solid rgba(28, 36, 32, 0.07);
+      backdrop-filter: blur(16px);
+    }
+
+    .head-row {
+      height: 34px;
+      display: grid;
+      grid-template-columns: 46px 1fr 46px;
+      align-items: center;
+    }
+
+    .back {
+      width: 38px;
+      height: 38px;
+      margin-left: -7px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      color: var(--green);
+      background: transparent;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 160ms ease, opacity 160ms ease;
+    }
+
+    .back:hover { background: rgba(23, 61, 51, 0.07); }
+    .back.is-hidden { opacity: 0; pointer-events: none; }
+
+    .mini-brand {
+      color: var(--green);
+      text-align: center;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.045em;
+    }
+
+    .step-count {
+      color: var(--muted);
+      text-align: right;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .progress {
+      height: 3px;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: var(--paper-deep);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--orange);
+      transition: width 360ms cubic-bezier(.2,.8,.2,1);
+    }
+
+    .viewport {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: none;
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 27px 25px calc(24px + env(safe-area-inset-bottom));
+      scrollbar-width: none;
+      background: var(--paper);
+    }
+
+    .screen::-webkit-scrollbar { display: none; }
+    .screen.active {
+      z-index: 2;
+      display: flex;
+      animation: enter 320ms cubic-bezier(.2,.72,.2,1) both;
+    }
+
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(13px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .eyebrow {
+      margin: 0 0 11px;
+      color: var(--orange);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+    }
+
+    h2, h3, p { margin-top: 0; }
+    h2 {
+      margin-bottom: 14px;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(30px, 8vw, 36px);
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: -0.06em;
+      text-wrap: balance;
+    }
+
+    h3 {
+      margin-bottom: 9px;
+      color: var(--green);
+      font-size: 18px;
+      line-height: 1.45;
+      letter-spacing: -0.04em;
+      text-wrap: balance;
+    }
+
+    p {
+      margin-bottom: 0;
+      font-size: 15px;
+      line-height: 1.72;
+      letter-spacing: -0.025em;
+      text-wrap: pretty;
+      overflow-wrap: break-word;
+    }
+
+    .subcopy { color: var(--muted); }
+
+    .opening {
+      justify-content: space-between;
+      padding-top: 40px;
+      color: var(--paper);
+      background: var(--green);
+    }
+
+    .opening::after {
+      content: "R";
+      position: absolute;
+      right: -22px;
+      bottom: 68px;
+      color: rgba(246, 243, 234, 0.045);
+      font-family: var(--serif);
+      font-size: 270px;
+      line-height: 0.7;
+      pointer-events: none;
+    }
+
+    .opening .eyebrow { color: #f29279; }
+    .opening h2 {
+      max-width: 340px;
+      color: var(--paper);
+      font-size: clamp(38px, 10vw, 48px);
+      line-height: 1.28;
+    }
+
+    .opening .subcopy {
+      max-width: 315px;
+      color: rgba(246, 243, 234, 0.7);
+    }
+
+    .opening-mark {
+      width: 54px;
+      height: 6px;
+      margin-bottom: 30px;
+      background: var(--orange);
+    }
+
+    .opening-meta {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 30px 0 0;
+      color: rgba(246, 243, 234, 0.56);
+      font-size: 12px;
+    }
+
+    .opening-meta span {
+      padding: 7px 10px;
+      border: 1px solid rgba(246, 243, 234, 0.18);
+      border-radius: 99px;
+    }
+
+    .actions {
+      position: relative;
+      z-index: 4;
+      margin-top: auto;
+      padding-top: 28px;
+    }
+
+    .primary, .secondary, .quiet-action {
+      width: 100%;
+      min-height: 54px;
+      border-radius: 16px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      cursor: pointer;
+      transition: transform 120ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .primary:active, .secondary:active, .quiet-action:active { transform: scale(0.985); }
+
+    .primary {
+      border: 1px solid var(--green);
+      color: var(--paper);
+      background: var(--green);
+      box-shadow: 0 8px 22px rgba(23, 61, 51, 0.13);
+    }
+
+    .primary:hover { background: #214b40; }
+    .opening .primary {
+      border-color: var(--paper);
+      color: var(--green);
+      background: var(--paper);
+    }
+
+    .secondary {
+      border: 1px solid var(--line);
+      color: var(--green);
+      background: var(--surface);
+    }
+
+    .quiet-action {
+      margin-top: 9px;
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      font-size: 13px;
+    }
+
+    .helper {
+      margin: 12px auto 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .choice-list {
+      margin-top: 24px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .choice {
+      position: relative;
+      width: 100%;
+      min-height: 64px;
+      padding: 16px 47px 16px 17px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      color: var(--ink);
+      text-align: left;
+      background: rgba(255, 253, 248, 0.66);
+      cursor: pointer;
+      transition: border-color 160ms ease, background 160ms ease, transform 120ms ease;
+    }
+
+    .choice:hover { border-color: #aaa99f; }
+    .choice:active { transform: scale(0.99); }
+    .choice strong {
+      display: block;
+      font-size: 15px;
+      letter-spacing: -0.035em;
+    }
+
+    .choice small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .choice::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 18px;
+      width: 17px;
+      height: 17px;
+      border: 1.5px solid #b8b6ad;
+      border-radius: 50%;
+      transform: translateY(-50%);
+    }
+
+    .choice.selected {
+      border-color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .choice.selected::after {
+      border: 5px solid var(--green);
+      background: var(--surface);
+    }
+
+    .input-label {
+      display: block;
+      margin: 27px 0 9px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 176px;
+      resize: none;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      color: var(--ink);
+      background: var(--surface);
+      font-size: 15px;
+      line-height: 1.72;
+      letter-spacing: -0.025em;
+      box-shadow: inset 0 1px 0 rgba(28, 36, 32, 0.02);
+    }
+
+    textarea::placeholder { color: #aaa9a1; }
+    textarea:focus { border-color: var(--green-mid); }
+
+    .privacy-note {
+      margin-top: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .privacy-note::before {
+      content: "";
+      flex: 0 0 auto;
+      width: 7px;
+      height: 7px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .question-index {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .question-index span {
+      width: 27px;
+      height: 4px;
+      border-radius: 99px;
+      background: var(--line);
+    }
+
+    .question-index span.on { background: var(--orange); }
+
+    .prompt-card {
+      position: relative;
+      margin: 20px 0 0;
+      padding: 22px 21px;
+      border-radius: 21px;
+      background: var(--green);
+      color: var(--paper);
+      overflow: hidden;
+    }
+
+    .prompt-card::after {
+      content: "“";
+      position: absolute;
+      right: 12px;
+      bottom: -38px;
+      color: rgba(246, 243, 234, 0.06);
+      font-family: var(--serif);
+      font-size: 128px;
+      line-height: 1;
+    }
+
+    .prompt-card p {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.55;
+      letter-spacing: -0.045em;
+    }
+
+    .answer-chips {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .chip {
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      color: var(--muted);
+      background: var(--surface);
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .chip.selected {
+      border-color: var(--green);
+      color: var(--green);
+      background: var(--green-soft);
+      font-weight: 700;
+    }
+
+    .short-answer { min-height: 112px; }
+
+    .not-advice {
+      margin-top: 17px;
+      padding: 14px 15px;
+      border-left: 3px solid var(--orange);
+      color: var(--muted);
+      background: var(--orange-soft);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .reflection {
+      margin-top: 27px;
+      border-top: 1px solid var(--line);
+    }
+
+    .reflection-row {
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .reflection-row span {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--orange);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .reflection-row p {
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .voice-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .letter-paper {
+      position: relative;
+      margin-top: 24px;
+      padding: 24px 21px 22px;
+      border: 1px solid #ded6c7;
+      border-radius: 5px;
+      background: #fffaf0;
+      box-shadow: 0 12px 32px rgba(48, 45, 36, 0.07);
+    }
+
+    .letter-paper::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 42px;
+      height: 4px;
+      background: var(--orange);
+    }
+
+    .letter-to, .letter-from {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .letter-body {
+      min-height: 245px;
+      margin: 18px 0 16px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      font-family: var(--serif);
+      font-size: 17px;
+      line-height: 1.85;
+    }
+
+    .letter-from { text-align: right; }
+
+    .edit-hint {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .recipient-card {
+      margin-top: 26px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+    }
+
+    .avatar {
+      flex: 0 0 auto;
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--paper);
+      background: var(--green);
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .recipient-card strong { display: block; font-size: 14px; }
+    .recipient-card small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .share-link {
+      margin-top: 12px;
+      padding: 13px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px dashed #bcb6a9;
+      border-radius: 14px;
+      color: var(--muted);
+      background: rgba(255, 253, 248, 0.54);
+      font-size: 11px;
+    }
+
+    .share-link span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .share-link strong {
+      flex: 0 0 auto;
+      color: var(--green);
+      font-size: 11px;
+    }
+
+    .switch-card {
+      margin: 22px 0;
+      padding: 24px 20px;
+      border-radius: 22px;
+      color: var(--paper);
+      background: var(--green);
+      text-align: center;
+    }
+
+    .switch-card .avatars {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .switch-card .avatar {
+      width: 47px;
+      height: 47px;
+      border: 3px solid var(--green);
+    }
+
+    .switch-card .avatar + .avatar {
+      margin-left: -10px;
+      color: var(--green);
+      background: var(--orange-soft);
+    }
+
+    .switch-card p {
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .switch-card small {
+      display: block;
+      margin-top: 8px;
+      color: rgba(246, 243, 234, 0.6);
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .receiver-badge {
+      width: fit-content;
+      margin-bottom: 18px;
+      padding: 7px 10px;
+      border-radius: 99px;
+      color: var(--green);
+      background: var(--green-soft);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
+
+    .received-letter {
+      margin-top: 21px;
+      padding: 24px 21px;
+      border-radius: 5px;
+      background: #fffaf0;
+      box-shadow: 0 12px 30px rgba(48, 45, 36, 0.07);
+    }
+
+    .received-letter p {
+      margin: 17px 0 20px;
+      font-family: var(--serif);
+      font-size: 17px;
+      line-height: 1.85;
+    }
+
+    .received-note {
+      margin-top: 14px;
+      padding: 13px 15px;
+      border-radius: 13px;
+      color: var(--muted);
+      background: var(--paper-deep);
+      font-size: 11px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .response-choice {
+      margin-top: 22px;
+      display: grid;
+      gap: 9px;
+    }
+
+    .response-choice button {
+      min-height: 48px;
+      padding: 0 15px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--green);
+      background: var(--surface);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .response-choice button:first-child {
+      border-color: var(--green);
+      color: var(--paper);
+      background: var(--green);
+      text-align: center;
+    }
+
+    .reply-preview {
+      margin-top: 22px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+    }
+
+    .reply-preview span {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--orange);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .reply-preview p {
+      font-family: var(--serif);
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .summary-screen { background: var(--paper); }
+
+    .summary-date {
+      margin-bottom: 20px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .summary-card {
+      margin-top: 16px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+    }
+
+    .summary-person {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .summary-person .avatar {
+      width: 31px;
+      height: 31px;
+      font-size: 12px;
+    }
+
+    .summary-card p {
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    .agreement {
+      margin-top: 13px;
+      padding: 19px;
+      border-radius: 18px;
+      background: var(--green);
+      color: var(--paper);
+    }
+
+    .agreement span {
+      display: block;
+      margin-bottom: 10px;
+      color: #f2a08c;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .agreement p {
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    .closing-copy {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+      text-align: center;
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: calc(28px + env(safe-area-inset-bottom));
+      z-index: 100;
+      max-width: calc(100% - 44px);
+      padding: 12px 17px;
+      border-radius: 99px;
+      color: var(--paper);
+      background: rgba(28, 36, 32, 0.94);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 14px);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 860px) {
+      body { background: var(--paper); }
+      .stage {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        display: block;
+      }
+      .context { display: none; }
+      .phone {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .app { border-radius: 0; }
+    }
+
+    @media (max-width: 370px) {
+      .app-head { padding-left: 18px; padding-right: 18px; }
+      .screen { padding-left: 20px; padding-right: 20px; }
+      h2 { font-size: 29px; }
+      .choice { padding-left: 15px; }
+      .prompt-card p { font-size: 20px; }
+      .letter-body, .received-letter p { font-size: 16px; }
+    }
+
+    @media (max-height: 690px) and (min-width: 861px) {
+      .phone { min-height: 620px; }
+      .screen { padding-top: 21px; }
+      h2 { font-size: 30px; }
+      .context-brand { margin-bottom: 34px; }
+      .journey { margin-top: 36px; }
+      .context-note { margin-top: 36px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <aside class="context" aria-label="세션 흐름 안내">
+      <div class="context-brand"><strong>Re:Mind</strong>&nbsp;&nbsp; CONVERSATION PREVIEW</div>
+      <h1>말하기 어려운 마음이<br />대화가 되는 과정</h1>
+      <p>AI는 답을 대신 만들지 않습니다. 짧은 질문으로 두 사람이 자기 말을 찾고, 직접 확인한 마음만 서로에게 전합니다.</p>
+
+      <div class="journey" aria-label="전체 진행 단계">
+        <div class="journey-item active" data-phase="0">내 마음</div>
+        <div class="journey-item" data-phase="1">편지</div>
+        <div class="journey-item" data-phase="2">상대 마음</div>
+        <div class="journey-item" data-phase="3">함께 확인</div>
+      </div>
+
+      <div class="context-note">
+        모바일 화면을 직접 눌러 한 번의 대화를 끝까지 경험해보세요.<br />
+        예시 상황 · 연락이 늦어진 연인에게 서운한 마음 전하기
+      </div>
+    </aside>
+
+    <section class="phone" aria-label="Re:Mind 모바일 프로토타입">
+      <div class="app">
+        <header class="app-head">
+          <div class="head-row">
+            <button class="back is-hidden" id="backButton" type="button" aria-label="이전 화면">‹</button>
+            <div class="mini-brand">Re:Mind</div>
+            <div class="step-count" id="stepCount">미리보기</div>
+          </div>
+          <div class="progress" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+        </header>
+
+        <div class="viewport" id="viewport">
+          <section class="screen opening active" data-step="0" data-phase="0" data-label="시작">
+            <div>
+              <div class="opening-mark"></div>
+              <p class="eyebrow">한 번의 대화 미리보기</p>
+              <h2>꺼내기 어려운 마음이 있나요?</h2>
+              <p class="subcopy">바로 보내기 전에 잠시 내 마음을 들여다보고, 내가 확인한 말로 전해보세요.</p>
+              <div class="opening-meta">
+                <span>연인</span>
+                <span>서운한 마음</span>
+                <span>약 2분</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="primary" type="button" data-next>대화 시작하기</button>
+              <p class="helper" style="color:rgba(246,243,234,.48)">이 미리보기의 내용은 기기에 저장되지 않아요.</p>
+            </div>
+          </section>
+
+          <section class="screen" data-step="1" data-phase="0" data-label="마음 선택">
+            <p class="eyebrow">먼저, 방향을 정해요</p>
+            <h2>어떤 마음을<br />전하고 싶나요?</h2>
+            <p class="subcopy">정확한 이름을 몰라도 괜찮아요. 지금 가장 가까운 마음을 골라주세요.</p>
+
+            <div class="choice-list" role="radiogroup" aria-label="전하고 싶은 마음">
+              <button class="choice selected" type="button" role="radio" aria-checked="true">
+                <strong>서운했던 마음</strong>
+                <small>알아주길 바랐지만 전하지 못한 것이 있어요</small>
+              </button>
+              <button class="choice" type="button" role="radio" aria-checked="false"><strong>미안했던 마음</strong></button>
+              <button class="choice" type="button" role="radio" aria-checked="false"><strong>조심스러운 부탁</strong></button>
+              <button class="choice" type="button" role="radio" aria-checked="false"><strong>함께 나누고 싶은 고민</strong></button>
+            </div>
+
+            <div class="actions">
+              <button class="primary" type="button" data-next>이 마음부터 정리하기</button>
+            </div>
+          </section>
+
+          <section class="screen" data-step="2" data-phase="0" data-label="상황 적기">
+            <p class="eyebrow">있는 그대로 적어도 괜찮아요</p>
+            <h2>무슨 일이<br />있었나요?</h2>
+            <p class="subcopy">문장을 다듬지 않아도 돼요. 상대에게 바로 전달되지 않습니다.</p>
+
+            <label class="input-label" for="situation">지금 떠오르는 대로 적어주세요</label>
+            <textarea id="situation">요즘 네가 바쁜 건 알겠는데, 아무 말 없이 연락이 늦어지면 나는 계속 기다리는 사람처럼 느껴져. 아까도 그래서 괜히 말이 세게 나왔어.</textarea>
+            <div class="privacy-note">지금 적는 내용은 내 마음을 정리하기 위한 재료예요. 내가 고른 문장만 상대에게 전달됩니다.</div>
+
+            <div class="actions">
+              <button class="primary" type="button" data-next>조금 더 들여다보기</button>
+            </div>
+          </section>
+
+          <section class="screen" data-step="3" data-phase="0" data-label="첫 번째 질문">
+            <div class="question-index" aria-label="질문 1/3"><span class="on"></span><span></span><span></span></div>
+            <p class="eyebrow">첫 번째 질문</p>
+            <h2>그 순간,<br />무엇이 가장 힘들었나요?</h2>
+
+            <div class="prompt-card"><p>연락이 늦었다는 사실보다 더 마음에 남은 것은 무엇이었나요?</p></div>
+            <div class="answer-chips" aria-label="감정 도움말">
+              <button class="chip" type="button">무시당한 느낌</button>
+              <button class="chip selected" type="button">혼자 남은 느낌</button>
+              <button class="chip" type="button">중요하지 않은 느낌</button>
+            </div>
+
+            <label class="input-label" for="answerOne">내 말로 적어보기</label>
+            <textarea class="short-answer" id="answerOne">화가 났다기보다, 나만 계속 기다리고 있는 것처럼 느껴져서 서운했어.</textarea>
+
+            <div class="actions">
+              <button class="primary" type="button" data-next>다음 질문</button>
+              <div class="not-advice">Re:Mind는 감정의 정답을 정하지 않아요. 질문은 내가 놓친 마음을 찾기 위한 길잡이일 뿐입니다.</div>
+            </div>
+          </section>
+
+          <section class="screen" data-step="4" data-phase="0" data-label="두 번째 질문">
+            <div class="question-index" aria-label="질문 2/3"><span class="on"></span><span class="on"></span><span></span></div>
+            <p class="eyebrow">두 번째 질문</p>
+            <h2>상대가 무엇을<br />알아주면 좋을까요?</h2>
+
+            <div class="prompt-card"><p>연락의 횟수보다 정말 바라는 행동이 따로 있을까요?</p></div>
+
+            <label class="input-label" for="answerTwo">바라는 마음을 적어주세요</label>
+            <textarea class="short-answer" id="answerTwo">바쁜 건 괜찮아. 다만 늦어질 것 같을 때 짧게라도 먼저 알려주면 좋겠어.</textarea>
+
+            <div class="actions">
+              <button class="primary" type="button" data-next>마지막 질문</button>
+            </div>
+          </section>
+
+          <section class="screen" data-step="5" data-phase="0" data-label="세 번째 질문">
+            <div class="question-index" aria-label="질문 3/3"><span class="on"></span><span class="on"></span><span class="on"></span></div>
+            <p class="eyebrow">마지막 질문</p>
+            <h2>내가 돌아보고 싶은<br />부분도 있나요?</h2>
+            <p class="subcopy">억지로 미안해할 필요는 없어요. 내가 직접 인정하고 싶은 부분만 남겨주세요.</p>
+
+            <label class="input-label" for="answerThree">내가 전하고 싶은 만큼만</label>
+            <textarea class="short-answer" id="answerThree">아까 감정적으로 몰아붙이듯 말한 건 미안해.</textarea>
+
+            <div class="actions">
+              <button class="primary" type="button" data-next>내 마음 확인하기</button>
+            </div>
+          </section>
+
+          <section class="screen" data-step="6" data-phase="0" data-label="마음 확인">
+            <p class="eyebrow">내가 찾은 마음</p>
+            <h2>전하고 싶은 건<br />화가 아니었어요.</h2>
+            <p class="subcopy">지금까지 적은 말에서 중요한 부분을 모았습니다. 내 뜻과 맞는지 먼저 확인해주세요.</p>
+
+            <div class="reflection">
+              <div class="reflection-row">
+                <span>내가 느낀 것</span>
+                <p>혼자 기다리는 사람처럼 느껴져서 서운했다.</p>
+              </div>
+              <div class="reflection-row">
+                <span>상대가 알아주길 바라는 것</span>
+                <p>늦어질 때 짧게라도 먼저 알려주면 좋겠다.</p>
+              </div>
+              <div class="reflection-row">
+                <span>내가 인정하고 싶은 것</span>
+                <p>감정적으로 몰아붙인 것은 미안하다.</p>
+              </div>
+            </div>
+            <p class="voice-note">AI의 해석이 아니라, 내가 직접 적은 말을 짧게 정리한 내용이에요. 맞지 않는 문장은 이전 단계에서 고칠 수 있습니다.</p>
+
+            <div class="actions">
+              <button class="primary" type="button" data-next>이 마음으로 편지 쓰기</button>
+            </div>
+          </section>
+
+          <section class="screen" data-step="7" data-phase="1" data-label="편지 확인">
+            <p class="eyebrow">보내기 전, 내 말로 확인해요</p>
+            <h2>내 마음을<br />편지로 담았어요.</h2>
+            <p class="subcopy">아래 문장은 자유롭게 고칠 수 있어요. 수정한 그대로 전달됩니다.</p>
+
+            <div class="letter-paper">
+              <div class="letter-to">민지에게</div>
+              <textarea class="letter-body" id="senderLetter">오늘 연락이 없어서 속상했어. 네가 바쁜 걸 이해 못 하는 건 아닌데, 아무 말 없이 기다리고 있으면 나만 계속 신경 쓰는 것처럼 느껴질 때가 있어.
+
+그래서 아까 말이 세게 나왔던 것 같아. 바쁜 날에는 늦을 것 같다고 짧게라도 알려주면 좋겠어. 나도 감정적으로 말한 건 미안해.</textarea>
+              <div class="letter-from">은찬</div>
+            </div>
+            <p class="edit-hint">AI가 쓴 편지가 아니라, 내 답을 연결한 초안입니다.</p>
+
+            <div class="actions">
+              <button class="primary" type="button" data-next>이대로 전달하기</button>
+            </div>
+          </section>
+
+          <section class="screen" data-step="8" data-phase="1" data-label="링크 전달">
+            <p class="eyebrow">앱 설치 없이 바로 읽어요</p>
+            <h2>민지에게 보낼<br />링크가 준비됐어요.</h2>
+            <p class="subcopy">상대는 답장을 재촉받지 않아요. 편지를 읽고, 준비됐을 때 자신의 마음을 정리할 수 있습니다.</p>
+
+            <div class="recipient-card">
+              <div class="avatar">민</div>
+              <div><strong>민지에게</strong><small>서운한 마음을 담은 편지 · 1분 읽기</small></div>
+            </div>
+            <div class="share-link"><span>remind.kr/m/7F3K9</span><strong>링크 복사</strong></div>
+
+            <div class="switch-card">
+              <div class="avatars"><div class="avatar">은</div><div class="avatar">민</div></div>
+              <p>이제 상대의 화면으로<br />이어집니다.</p>
+              <small>실제 서비스에서는 카카오톡이나 문자로 링크를 전달해요.</small>
+            </div>
+
+            <div class="actions">
+              <button class="primary" id="shareButton" type="button" data-next>링크로 전달하기</button>
+            </div>
+          </section>
+
+          <section class="screen" data-step="9" data-phase="2" data-label="편지 읽기">
+            <div class="receiver-badge">민지의 화면</div>
+            <p class="eyebrow">은찬이 마음을 보냈어요</p>
+            <h2>답하기 전에,<br />천천히 읽어보세요.</h2>
+
+            <div class="received-letter">
+              <div class="letter-to">민지에게</div>
+              <p>오늘 연락이 없어서 속상했어. 네가 바쁜 걸 이해 못 하는 건 아닌데, 아무 말 없이 기다리고 있으면 나만 계속 신경 쓰는 것처럼 느껴질 때가 있어.<br /><br />그래서 아까 말이 세게 나왔던 것 같아. 바쁜 날에는 늦을 것 같다고 짧게라도 알려주면 좋겠어. 나도 감정적으로 말한 건 미안해.</p>
+              <div class="letter-from">은찬</div>
+            </div>
+            <div class="received-note">은찬이 직접 확인하고 보낸 편지예요.<br />지금 바로 답하지 않아도 괜찮아요.</div>
+
+            <div class="response-choice">
+              <button type="button" data-next>내 마음 정리해서 답하기</button>
+              <button type="button" data-toast="읽었다는 마음만 전했어요.">잘 읽었다고 먼저 전하기</button>
+              <button type="button" data-toast="준비됐을 때 다시 이어갈 수 있어요.">조금 뒤에 답하기</button>
+            </div>
+          </section>
+
+          <section class="screen" data-step="10" data-phase="2" data-label="상대 마음">
+            <div class="receiver-badge">민지의 화면</div>
+            <p class="eyebrow">내 마음도 먼저 살펴봐요</p>
+            <h2>어떤 문장이<br />가장 마음에 남았나요?</h2>
+
+            <div class="prompt-card"><p>“나만 계속 기다리는 것처럼 느껴질 때가 있어.”</p></div>
+
+            <label class="input-label" for="receiverFeeling">그 문장을 읽고 든 마음</label>
+            <textarea class="short-answer" id="receiverFeeling">연락 한 번이 그렇게 크게 느껴지는 줄 몰랐어. 기다리는 입장에서는 다르게 느껴질 수 있겠다는 생각이 들었어.</textarea>
+
+            <label class="input-label" for="receiverWish">나도 전하지 못했던 마음</label>
+            <textarea class="short-answer" id="receiverWish">일부러 무시한 건 아니었고, 바쁠 때마다 바로 연락해야 한다는 부담도 조금 있었어.</textarea>
+
+            <div class="actions">
+              <button class="primary" type="button" data-next>내 답장 확인하기</button>
+            </div>
+          </section>
+
+          <section class="screen" data-step="11" data-phase="2" data-label="답장 확인">
+            <div class="receiver-badge">민지의 화면</div>
+            <p class="eyebrow">내 말로 확인한 답장</p>
+            <h2>이 마음을<br />은찬에게 전할까요?</h2>
+
+            <div class="letter-paper">
+              <div class="letter-to">은찬에게</div>
+              <textarea class="letter-body" id="receiverLetter">읽고 나니까 네가 왜 서운했는지 알 것 같아. 일부러 무시한 건 아니었는데, 기다리는 입장까지 생각하지 못한 건 미안해.
+
+다음부터 늦어질 것 같으면 짧게라도 먼저 말할게. 대신 나도 정신없는 상황이 있을 수 있다는 건 알아줬으면 좋겠어.</textarea>
+              <div class="letter-from">민지</div>
+            </div>
+            <p class="edit-hint">내가 고친 문장과 말투 그대로 전달됩니다.</p>
+
+            <div class="actions">
+              <button class="primary" type="button" data-next>답장 보내기</button>
+            </div>
+          </section>
+
+          <section class="screen summary-screen" data-step="12" data-phase="3" data-label="함께 확인">
+            <p class="summary-date">2026. 08. 07 · 우리의 대화</p>
+            <p class="eyebrow">두 사람이 직접 확인한 내용</p>
+            <h2>오늘 서로에게<br />닿은 마음</h2>
+            <p class="subcopy">누가 맞는지 판단하지 않고, 두 사람이 이해한 내용만 남겼어요.</p>
+
+            <div class="summary-card">
+              <div class="summary-person"><div class="avatar">은</div>은찬의 마음</div>
+              <p>연락 자체보다 혼자 기다리는 사람처럼 느껴지는 것이 힘들었다.</p>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-person"><div class="avatar" style="background:var(--orange);">민</div>민지의 마음</div>
+              <p>일부러 무시한 것은 아니지만, 기다리는 입장을 생각하지 못했다.</p>
+            </div>
+
+            <div class="agreement">
+              <span>다음에 함께 해보기로 한 것</span>
+              <p>늦어질 때는 짧게 먼저 알리고, 서로의 상황도 한 번 더 물어보기.</p>
+            </div>
+
+            <p class="closing-copy">이 대화가 모든 것을 해결한 건 아니에요.<br />그래도 다음 대화를 시작할 한 문장은 남았습니다.</p>
+
+            <div class="actions">
+              <button class="primary" type="button" data-restart>처음부터 다시 보기</button>
+              <button class="quiet-action" type="button" data-toast="대화 기록에 저장됐어요.">우리의 대화에 남기기</button>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const screens = [...document.querySelectorAll('.screen')];
+      const progressBar = document.getElementById('progressBar');
+      const stepCount = document.getElementById('stepCount');
+      const backButton = document.getElementById('backButton');
+      const toast = document.getElementById('toast');
+      const journeyItems = [...document.querySelectorAll('.journey-item')];
+      let current = 0;
+      let toastTimer;
+
+      function showToast(message) {
+        clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.classList.add('show');
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 1900);
+      }
+
+      function goTo(step, pushHash = true) {
+        const next = Math.max(0, Math.min(step, screens.length - 1));
+        current = next;
+
+        screens.forEach((screen, index) => {
+          screen.classList.toggle('active', index === current);
+          if (index === current) screen.scrollTop = 0;
+        });
+
+        const phase = Number(screens[current].dataset.phase || 0);
+        journeyItems.forEach((item, index) => {
+          item.classList.toggle('active', index === phase);
+          item.classList.toggle('done', index < phase);
+        });
+
+        backButton.classList.toggle('is-hidden', current === 0);
+        stepCount.textContent = current === 0 ? '미리보기' : `${current} / ${screens.length - 1}`;
+        progressBar.style.width = current === 0 ? '0%' : `${(current / (screens.length - 1)) * 100}%`;
+
+        if (pushHash) history.replaceState(null, '', `#step-${current}`);
+        document.title = current === 0
+          ? 'Re:Mind — 대화 세션 미리보기'
+          : `Re:Mind — ${screens[current].dataset.label}`;
+      }
+
+      document.querySelectorAll('[data-next]').forEach(button => {
+        button.addEventListener('click', () => {
+          if (button.id === 'shareButton') showToast('민지에게 링크를 전달했어요.');
+          goTo(current + 1);
+        });
+      });
+
+      document.querySelectorAll('[data-restart]').forEach(button => {
+        button.addEventListener('click', () => goTo(0));
+      });
+
+      document.querySelectorAll('[data-toast]').forEach(button => {
+        button.addEventListener('click', () => showToast(button.dataset.toast));
+      });
+
+      backButton.addEventListener('click', () => goTo(current - 1));
+
+      document.querySelectorAll('.choice-list').forEach(group => {
+        const choices = [...group.querySelectorAll('.choice')];
+        choices.forEach(choice => {
+          choice.addEventListener('click', () => {
+            choices.forEach(item => {
+              const selected = item === choice;
+              item.classList.toggle('selected', selected);
+              item.setAttribute('aria-checked', String(selected));
+            });
+          });
+        });
+      });
+
+      document.querySelectorAll('.answer-chips').forEach(group => {
+        group.querySelectorAll('.chip').forEach(chip => {
+          chip.addEventListener('click', () => chip.classList.toggle('selected'));
+        });
+      });
+
+      document.querySelector('.share-link').addEventListener('click', () => {
+        showToast('미리보기 링크를 복사했어요.');
+      });
+
+      document.addEventListener('keydown', event => {
+        if (event.key === 'ArrowRight' && document.activeElement.tagName !== 'TEXTAREA') goTo(current + 1);
+        if (event.key === 'ArrowLeft' && document.activeElement.tagName !== 'TEXTAREA') goTo(current - 1);
+      });
+
+      const hashStep = Number((location.hash.match(/step-(\d+)/) || [])[1]);
+      goTo(Number.isFinite(hashStep) ? hashStep : 0, false);
+    })();
+  </script>
+</body>
+</html>
