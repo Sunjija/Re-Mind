@@ -1546,6 +1546,26 @@
 
     .service-step:last-child p { color: #b8c8c1; }
 
+    @media (min-width: 821px) and (max-width: 1120px) {
+      .service-flow { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+      .service-step {
+        grid-column: span 3;
+        min-height: 108px;
+        padding: 14px 16px;
+      }
+      .service-step:nth-child(n + 5) {
+        grid-column: span 4;
+        border-top: 1px solid var(--line);
+      }
+      .service-step:nth-child(5) { border-left: 0; }
+      .service-step p { display: none; }
+      .service-num {
+        margin-bottom: 18px;
+        font-size: clamp(26px, 3vw, 34px);
+      }
+      .service-step h3 { font-size: clamp(15px, 1.65vw, 18px); }
+    }
+
     .phone-stage {
       grid-template-columns: minmax(300px, 0.9fr) minmax(380px, 1.1fr);
       gap: clamp(48px, 7vw, 110px);
