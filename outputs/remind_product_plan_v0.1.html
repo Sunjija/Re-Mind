@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Re:Mind AI 기반 관계 회복 플랫폼 서비스 기획안 v0.1" />
+  <meta name="description" content="Re:Mind — 커플이 자신의 감정을 이해하고 서로에게 잘 전하도록 돕는 비동기 관계 대화 서비스" />
   <title>Re:Mind — Product Plan v0.1</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1505,6 +1505,47 @@
       font-family: var(--serif);
     }
 
+    .service-flow {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      width: 100%;
+      max-width: 1320px;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .service-step {
+      position: relative;
+      min-height: clamp(205px, 28vh, 310px);
+      padding: clamp(18px, 1.6vw, 28px) clamp(12px, 1.25vw, 22px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .service-step + .service-step { border-left: 1px solid var(--line); }
+    .service-step:last-child { color: var(--paper); background: var(--green); }
+
+    .service-num {
+      margin-bottom: auto;
+      color: var(--orange);
+      font-family: var(--serif);
+      font-size: clamp(26px, 2.7vw, 44px);
+      line-height: 1;
+    }
+
+    .service-step h3 {
+      margin-bottom: 9px;
+      font-size: clamp(15px, 1.25vw, 21px);
+    }
+
+    .service-step p {
+      color: var(--muted);
+      font-size: clamp(11px, 0.88vw, 14px);
+      line-height: 1.55;
+    }
+
+    .service-step:last-child p { color: #b8c8c1; }
+
     .phone-stage {
       grid-template-columns: minmax(300px, 0.9fr) minmax(380px, 1.1fr);
       gap: clamp(48px, 7vw, 110px);
@@ -1800,9 +1841,9 @@
         </div>
         <p class="cover-sub"><span class="line">마음과 마음 사이,</span><span class="line">대화가 다시 이어지도록.</span></p>
         <hr class="rule" />
-        <p class="lead">내 감정을 이해하고, 나다운 말로 상대에게 전하도록 돕는 관계 대화 서비스</p>
+        <p class="lead">커플이 감정이 앞서는 순간, 자신의 마음을 먼저 이해하고 나다운 말로 전하도록 돕는 비동기 대화 서비스</p>
         <div class="cover-meta" style="margin-top:32px">
-          <span class="pill">AI 기반 관계 대화 서비스</span>
+          <span class="pill">커플을 위한 감정 커뮤니케이션 메신저</span>
           <span class="pill">2026.08</span>
         </div>
       </div>
@@ -1812,13 +1853,16 @@
     <section class="slide" data-title="How it works" aria-hidden="true">
       <header class="slide-head"><span class="brand">Re:Mind</span><span>How it works</span></header>
       <div class="slide-body">
-        <p class="eyebrow">Re:Mind는 이렇게 작동합니다</p>
-        <h2><span class="line">한 사람의 마음 정리에서</span><span class="line">둘의 대화까지.</span></h2>
-        <div class="flow">
-          <article class="flow-item"><span class="flow-number">01</span><div><h3>마음을 적는다</h3><p>싸운 뒤, 하고 싶었던 말을 꺼낸다.</p></div></article>
-          <article class="flow-item"><span class="flow-number">02</span><div><h3>질문으로 정리한다</h3><p>AI가 감정과 바람을 확인하도록 돕는다.</p></div></article>
-          <article class="flow-item"><span class="flow-number">03</span><div><h3>마음을 전한다</h3><p>내 마음이 잘 담겼는지 읽어보고 상대에게 보낸다.</p></div></article>
-          <article class="flow-item"><span class="flow-number">04</span><div><h3>각자의 마음으로 답한다</h3><p>상대도 바로 답하지 않고 마음부터 정리한다.</p></div></article>
+        <p class="eyebrow">Re:Mind가 대화를 잇는 순서</p>
+        <h2><span class="line">적고, 이해하고, 확인해 보내고,</span><span class="line">준비됐을 때 답한다.</span></h2>
+        <div class="service-flow">
+          <article class="service-step"><span class="service-num">01</span><div><h3>상황을 적는다</h3><p>무슨 일이 있었고 어떤 말을 하고 싶은지 적는다.</p></div></article>
+          <article class="service-step"><span class="service-num">02</span><div><h3>질문에 답한다</h3><p>짧은 질문으로 감정과 바람을 돌아본다.</p></div></article>
+          <article class="service-step"><span class="service-num">03</span><div><h3>마음을 확인한다</h3><p>내가 정말 전하고 싶은 뜻을 직접 고른다.</p></div></article>
+          <article class="service-step"><span class="service-num">04</span><div><h3>편지로 모은다</h3><p>내가 한 말을 바탕으로 편지 형태로 정리한다.</p></div></article>
+          <article class="service-step"><span class="service-num">05</span><div><h3>고쳐서 보낸다</h3><p>말투와 뜻을 직접 확인하고 링크로 보낸다.</p></div></article>
+          <article class="service-step"><span class="service-num">06</span><div><h3>천천히 읽는다</h3><p>상대는 설치 없이 읽고 자기 마음을 정리한다.</p></div></article>
+          <article class="service-step"><span class="service-num">07</span><div><h3>원할 때 답한다</h3><p>준비됐을 때 답장하고 서로 알게 된 마음을 남긴다.</p></div></article>
         </div>
       </div>
       <footer class="slide-foot"><span>01 / How it works</span><span>02</span></footer>
@@ -1827,8 +1871,8 @@
     <section class="slide" data-title="Problem" aria-hidden="true">
       <header class="slide-head"><span class="brand">Re:Mind</span><span>Problem</span></header>
       <div class="slide-body">
-        <p class="eyebrow">메신저에서 벌어지는 일</p>
-        <h2><span class="line">감정보다 표현이</span><span class="line">먼저 도착한다.</span></h2>
+        <p class="eyebrow">커플이 감정을 메신저로 전할 때</p>
+        <h2><span class="line">마음과 의도보다,</span><span class="line">짧은 한마디가 먼저 읽힌다.</span></h2>
         <div class="chat-pair">
           <div class="bubble-wrap">
             <span class="bubble-note">늦은 저녁, 기다리던 연락이 없었을 때</span>
@@ -1848,20 +1892,20 @@
     <section class="slide" data-title="How conflict grows" aria-hidden="true">
       <header class="slide-head"><span class="brand">Re:Mind</span><span>Problem</span></header>
       <div class="slide-body">
-        <p class="eyebrow">갈등이 커지는 구조</p>
-        <h2><span class="line">마음은 뒤에 남고,</span><span class="line">날카로운 말만 기억된다.</span></h2>
+        <p class="eyebrow">오해가 생기는 구조</p>
+        <h2><span class="line">전하고 싶은 마음과</span><span class="line">읽히는 의미 사이에 틈이 생긴다.</span></h2>
         <div class="three-step">
           <article class="step-card">
-            <span class="step-num">01 · 마음</span>
+            <span class="step-num">01 · 실제 마음</span>
             <p>서운함<br />외로움<br />불안함</p>
           </article>
           <article class="step-card">
-            <span class="step-num">02 · 표현</span>
-            <p>“맨날”<br />“됐어”<br />“마음대로 해”</p>
+            <span class="step-num">02 · 보낸 말</span>
+            <p>“왜 연락 안 해?”<br />“됐어”<br />“알아서 해”</p>
           </article>
           <article class="step-card">
-            <span class="step-num">03 · 반응</span>
-            <p>방어하고<br />반격하고<br />대화를 닫는다</p>
+            <span class="step-num">03 · 읽힌 의미</span>
+            <p>나를 비난한다<br />내 말을 무시한다<br />대화를 끝내려 한다</p>
           </article>
         </div>
       </div>
@@ -1873,9 +1917,9 @@
       <div class="slide-body">
         <p class="eyebrow">우리가 주목한 것</p>
         <div class="insight-box">
-          <p>많은 관계에서 갈등 자체보다, <span class="accent">내 마음과 의도가 제대로 닿지 않았다는 경험</span>이 두 사람의 거리를 키운다.</p>
+          <p>문제는 마음이 없는 것이 아니라, <span class="accent">마음이 닿기 전에 말이 엇갈리는 것</span>이다.</p>
         </div>
-        <p class="muted" style="margin-top:26px">그래서 갈등을 판정하는 대신, 이해가 시작될 틈을 만든다.</p>
+        <p class="muted" style="margin-top:26px">Re:Mind는 보내기 전에 내 마음을 이해하고, 오해가 덜한 방식으로 전할 순서를 만든다.</p>
       </div>
       <footer class="slide-foot"><span>03 / Insight</span><span>05</span></footer>
     </section>
@@ -1883,12 +1927,12 @@
     <section class="slide" data-title="Gap" aria-hidden="true">
       <header class="slide-head"><span class="brand">Re:Mind</span><span>Market gap</span></header>
       <div class="slide-body">
-        <p class="eyebrow">지금의 선택지</p>
-        <h2><span class="line">기록하거나, 혼자 상담하거나.</span><span class="line">둘이 다시 말하게 만드는</span><span class="line">경험은 드물다.</span></h2>
+        <p class="eyebrow">감정을 전하려는 순간의 선택지</p>
+        <h2><span class="line">바로 보내거나, 혼자 정리하거나.</span><span class="line">마음을 정리해 실제 상대에게</span><span class="line">전하는 경험은 드물다.</span></h2>
         <div class="compare-grid">
           <article class="compare-card">
-            <span class="compare-label">커플 앱</span>
-            <div><h3>관계를 기록한다</h3><p>일정 · 기념일 · 사진 · 채팅</p></div>
+            <span class="compare-label">일반 메신저</span>
+            <div><h3>바로 주고받는다</h3><p>감정을 정리하거나 오해를 점검할 틈이 없다</p></div>
           </article>
           <article class="compare-card">
             <span class="compare-label">AI 상담</span>
@@ -1896,7 +1940,7 @@
           </article>
           <article class="compare-card ours">
             <span class="compare-label">Re:Mind</span>
-            <div><h3>둘의 대화를 잇는다</h3><p>각자의 마음을 정리한 뒤 서로에게 전달</p></div>
+            <div><h3>둘의 마음을 잇는다</h3><p>각자의 마음을 정리한 뒤 편지와 답장으로 연결</p></div>
           </article>
         </div>
       </div>
@@ -1906,11 +1950,11 @@
     <section class="slide" data-title="Solution" aria-hidden="true">
       <header class="slide-head"><span class="brand">Re:Mind</span><span>Solution</span></header>
       <div class="slide-body">
-        <p class="eyebrow">Re:Mind가 하는 일</p>
+        <p class="eyebrow">Re:Mind가 만드는 변화</p>
         <div class="statement">
-          <div class="statement-line"><span class="no">판단하지 않고</span><span>누가 맞는지 정하지 않는다.</span></div>
-          <div class="statement-line"><span class="no">설득하지 않고</span><span>관계를 유지하라 말하지 않는다.</span></div>
-          <div class="statement-line"><span class="no">대신</span><span>서로 이해할 수 있는 대화를 설계한다.</span></div>
+          <div class="statement-line"><span class="no">먼저</span><span>내가 무엇을 느끼는지 이해한다.</span></div>
+          <div class="statement-line"><span class="no">내 말로</span><span>뜻과 말투를 직접 확인해 전한다.</span></div>
+          <div class="statement-line"><span class="no">서로에게</span><span>준비됐을 때 답할 수 있는 시간을 준다.</span></div>
         </div>
       </div>
       <footer class="slide-foot"><span>05 / Solution</span><span>07</span></footer>
@@ -1920,7 +1964,7 @@
       <header class="slide-head"><span class="brand">Re:Mind</span><span>Human first</span></header>
       <div class="slide-body">
         <p class="eyebrow">가장 중요한 제품 원칙</p>
-        <h2><span class="line">AI가 대신 쓰지 않는다.</span><span class="line green">사람의 말을</span><span class="line green">찾도록 돕는다.</span></h2>
+        <h2><span class="line">AI가 대신 말하지 않는다.</span><span class="line green">사람이 자기 말을</span><span class="line green">찾도록 돕는다.</span></h2>
         <div class="rewrite">
           <article class="rewrite-card bad">
             <span class="rewrite-tag">과하게 보정된 말</span>
@@ -1970,13 +2014,13 @@
     <section class="slide" data-title="Core flow" aria-hidden="true">
       <header class="slide-head"><span class="brand">Re:Mind</span><span>Core experience</span></header>
       <div class="slide-body">
-        <p class="eyebrow">하나의 대화가 만들어지는 과정</p>
-        <h2><span class="line">바로 보내지 않고,</span><span class="line">한 번 마음을 거친다.</span></h2>
+        <p class="eyebrow">보내는 사람에서 받는 사람까지</p>
+        <h2><span class="line">대화는 실시간 충돌 대신,</span><span class="line">각자의 속도로 이어진다.</span></h2>
         <div class="flow">
-          <article class="flow-item"><span class="flow-number">01</span><div><h3>꺼내기</h3><p>무슨 일이 있었는지 내 말로 적는다.</p></div></article>
-          <article class="flow-item"><span class="flow-number">02</span><div><h3>발견하기</h3><p>짧은 질문으로 감정과 바람을 확인한다.</p></div></article>
-          <article class="flow-item"><span class="flow-number">03</span><div><h3>전달하기</h3><p>내 마음이 잘 담겼는지 읽어보고 상대에게 보낸다.</p></div></article>
-          <article class="flow-item"><span class="flow-number">04</span><div><h3>이해하기</h3><p>상대도 답장보다 자기 마음부터 정리한다.</p></div></article>
+          <article class="flow-item"><span class="flow-number">01</span><div><h3>보내는 사람</h3><p>상황을 적고 질문을 통해 감정과 바람을 찾는다.</p></div></article>
+          <article class="flow-item"><span class="flow-number">02</span><div><h3>편지 확인</h3><p>내 말을 바탕으로 정리된 편지를 직접 고치고 확인한다.</p></div></article>
+          <article class="flow-item"><span class="flow-number">03</span><div><h3>받는 사람</h3><p>웹 링크로 천천히 읽고, 자기 마음부터 돌아본다.</p></div></article>
+          <article class="flow-item"><span class="flow-number">04</span><div><h3>둘의 대화</h3><p>준비됐을 때 답장하고 서로 새롭게 알게 된 마음을 남긴다.</p></div></article>
         </div>
       </div>
       <footer class="slide-foot"><span>07 / Core experience</span><span>10</span></footer>
@@ -1989,10 +2033,10 @@
           <div class="phone" aria-label="감정 탐색 화면 예시">
             <div class="phone-inner">
               <div class="phone-kicker">Re:Mind · 2분이면 충분해요</div>
-              <div class="phone-question">그 순간, 가장 가까웠던 마음은 무엇이었나요?</div>
-              <div class="choice">화가 났다</div>
-              <div class="choice selected">혼자인 것 같았다</div>
-              <div class="choice">무시당한 것 같았다</div>
+              <div class="phone-question">상대가 꼭 알아줬으면 하는 마음은 무엇인가요?</div>
+              <div class="choice">서운했다</div>
+              <div class="choice selected">나만 애쓰는 것 같았다</div>
+              <div class="choice">우리 사이가 걱정됐다</div>
               <div class="choice">내 말로 적을게요</div>
               <div class="phone-button">다음</div>
             </div>
@@ -2002,7 +2046,7 @@
             <h2><span class="line">질문은 짧게,</span><span class="line">선택권은 분명하게.</span></h2>
             <div class="mini-point"><strong>1</strong><p>고정 설문이 아닌 2~5개의 맞춤 질문</p></div>
             <div class="mini-point"><strong>2</strong><p>감정은 AI가 정답처럼 말하지 않고 사용자가 고른다</p></div>
-            <div class="mini-point"><strong>3</strong><p>보정 강도는 ‘그대로 · 조금만 · 오해만 점검’ 중 선택</p></div>
+            <div class="mini-point"><strong>3</strong><p>편지는 직접 고치고 확인해야만 상대에게 보낼 수 있다</p></div>
           </div>
         </div>
       </div>
@@ -2012,14 +2056,14 @@
     <section class="slide" data-title="Receiver experience" aria-hidden="true">
       <header class="slide-head"><span class="brand">Re:Mind</span><span>Receiver experience</span></header>
       <div class="slide-body">
-        <p class="eyebrow">수신자 경험</p>
-        <h2><span class="line">읽는 순간에도</span><span class="line">답장을 재촉하지 않는다.</span></h2>
+        <p class="eyebrow">읽기와 답장 사이에 시간을 둔다</p>
+        <h2><span class="line">천천히 읽고,</span><span class="line">준비됐을 때 답한다.</span></h2>
         <div class="insight-box" style="max-width:980px">
-          <p style="font-size:clamp(22px,2.7vw,42px)">“상대가 자신의 마음을 정리해 보낸 메시지예요. <span class="green">바로 답하지 않아도 괜찮아요.</span>”</p>
+          <p style="font-size:clamp(22px,2.7vw,42px)">“당신에게 전하고 싶었던 마음이 도착했어요. <span class="green">천천히 읽고, 답하고 싶을 때 답해주세요.</span>”</p>
           <div class="response-chips">
             <span class="response-chip">읽었어요</span>
-            <span class="response-chip">생각할 시간이 필요해요</span>
-            <span class="response-chip">답장하고 싶어요</span>
+            <span class="response-chip">조금 더 생각할게요</span>
+            <span class="response-chip">나도 마음을 정리할게요</span>
           </div>
         </div>
         <p class="muted" style="margin-top:24px">설치 없이 웹에서 읽고 반응한다. 앱 설치는 좋은 경험이 끝난 뒤 제안한다.</p>
@@ -2030,27 +2074,27 @@
     <section class="slide" data-title="MVP" aria-hidden="true">
       <header class="slide-head"><span class="brand">Re:Mind</span><span>MVP</span></header>
       <div class="slide-body">
-        <p class="eyebrow">첫 번째 제품</p>
-        <h2><span class="line">한 번의 갈등을</span><span class="line">한 번의 안전한 대화로.</span></h2>
+        <p class="eyebrow">첫 번째 타깃은 커플</p>
+        <h2><span class="line">커플의 어려운 감정 대화를</span><span class="line">오해가 덜한 대화로.</span></h2>
         <div class="scope-grid">
           <article class="scope-column">
             <h3 class="green">Version 1.0에 담는 것</h3>
             <div class="scope-list">
-              <div class="scope-item">빠른 감정 입력</div>
+              <div class="scope-item">커플 연결</div>
+              <div class="scope-item">빠른 상황 입력</div>
               <div class="scope-item">2~5개 맞춤 질문</div>
-              <div class="scope-item">말투 보존 메시지</div>
-              <div class="scope-item">수정·확인·공유</div>
+              <div class="scope-item">직접 검토하는 편지</div>
               <div class="scope-item">웹 링크 열람</div>
-              <div class="scope-item">부담 없는 반응·답장</div>
+              <div class="scope-item">비동기 답장·이해 정리</div>
             </div>
           </article>
           <article class="scope-column later">
             <h3 class="muted">검증 후 확장하는 것</h3>
             <div class="scope-list">
-              <div class="scope-item">커플 계정 연결</div>
               <div class="scope-item">갈등 히스토리</div>
+              <div class="scope-item">반복 패턴 분석</div>
               <div class="scope-item">장기 관계 리포트</div>
-              <div class="scope-item">성장 프로그램</div>
+              <div class="scope-item">다른 관계로 확장</div>
             </div>
           </article>
         </div>
@@ -2065,15 +2109,15 @@
         <div class="three-step">
           <article class="step-card">
             <span class="step-num">HYPOTHESIS 01</span>
-            <p>사람은 후회할 말을 보내기 전에 Re:Mind를 열까?</p>
+            <p>커플은 감정적인 메시지를 보내기 전에 Re:Mind를 열까?</p>
           </article>
           <article class="step-card">
             <span class="step-num">HYPOTHESIS 02</span>
-            <p>정리된 문장이 내 마음에 더 가깝다고 느낄까?</p>
+            <p>완성한 편지를 ‘AI의 말’이 아닌 ‘내 말’로 느낄까?</p>
           </article>
           <article class="step-card">
             <span class="step-num">HYPOTHESIS 03</span>
-            <p>상대는 부담 없이 읽고 마음을 이해할 수 있을까?</p>
+            <p>상대는 마음을 더 잘 이해하고, 준비됐을 때 답할까?</p>
           </article>
         </div>
       </div>
@@ -2087,10 +2131,10 @@
         <div class="metric-stage">
           <div class="north-star">
             <small>NORTH STAR</small>
-            <p>“상대의 마음을 이전보다 이해했다”고 답한 세션의 비율</p>
+            <p>편지를 받은 사람이 “상대의 마음을 이전보다 이해했다”고 답한 비율</p>
           </div>
           <div class="metric-list">
-            <div class="metric"><b>내 마음 정확도</b><span>이 문장이 정말 내 뜻인가</span></div>
+            <div class="metric"><b>편지 자기다움</b><span>이 편지가 정말 내 말인가</span></div>
             <div class="metric"><b>발송 후 후회</b><span>보낸 뒤 지우고 싶지 않았는가</span></div>
             <div class="metric"><b>편지 열람</b><span>상대가 부담 없이 열어봤는가</span></div>
             <div class="metric"><b>이해의 변화</b><span>상대의 마음을 새롭게 알았는가</span></div>
@@ -2151,8 +2195,8 @@
         <div class="vision-stage">
           <div>
             <p class="eyebrow">장기 비전</p>
-            <h2><span class="line">어려운 감정을</span><span class="line">안전하게 건네는 방법.</span></h2>
-            <p class="lead">연인에서 시작해, 서로를 이해하려는 모든 관계의 커뮤니케이션 플랫폼으로.</p>
+            <h2><span class="line">어려운 감정을</span><span class="line">더 잘 건네는 방법.</span></h2>
+            <p class="lead">커플의 어려운 대화에서 시작해, 서로를 이해하려는 모든 관계의 커뮤니케이션 플랫폼으로.</p>
           </div>
           <div class="relationship-map" aria-label="연인, 가족, 친구, 동료 관계 확장">
             <span class="relation-line l1"></span><span class="relation-line l2"></span><span class="relation-line l3"></span><span class="relation-line l4"></span>
@@ -2170,8 +2214,8 @@
     <section class="slide closing" data-title="Closing" aria-hidden="true">
       <header class="slide-head"><span class="brand">Re:Mind</span><span>Closing</span></header>
       <div class="slide-body">
-        <p class="closing-copy"><span class="line">좋은 말을 만들어주는 대신,</span><span class="line green">내 진짜 마음을 찾게 한다.</span></p>
-        <p class="closing-small">Re:Mind — 서로를 이해할 수 있는 대화를 설계합니다.</p>
+        <p class="closing-copy"><span class="line">내 마음을 이해하고,</span><span class="line green">내 말로 서로에게 닿게 한다.</span></p>
+        <p class="closing-small">Re:Mind — 마음과 마음 사이, 대화가 다시 이어지도록.</p>
       </div>
       <footer class="slide-foot"><span>Thank you</span><span>19</span></footer>
     </section>
