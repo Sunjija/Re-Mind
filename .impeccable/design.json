@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-10T08:26:16+09:00",
+  "title": "Design System: Re:Mind",
+  "extensions": {
+    "colorMeta": {
+      "deep-green": {
+        "role": "primary",
+        "displayName": "깊은 잉크 녹색",
+        "canonical": "#173D33",
+        "tonalRamp": ["#071510", "#0D261F", "#173D33", "#2E5A4D", "#527B6F", "#86A69C", "#BFD2CB", "#EFF5F2"]
+      },
+      "middle-green": {
+        "role": "primary",
+        "displayName": "중간 잉크 녹색",
+        "canonical": "#2E5A4D",
+        "tonalRamp": ["#091712", "#173029", "#2E5A4D", "#477367", "#6F968B", "#9EB9B1", "#CCDCD7", "#F1F6F4"]
+      },
+      "coral": {
+        "role": "secondary",
+        "displayName": "따뜻한 산호색",
+        "canonical": "#D9553A",
+        "tonalRamp": ["#2C0B06", "#5A1D12", "#8A301F", "#B9432D", "#D9553A", "#E78670", "#F2B7A8", "#FCEDE8"]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "따뜻한 종이",
+        "canonical": "#F6F3EA",
+        "tonalRamp": ["#27251F", "#4B473E", "#716B5F", "#9A9385", "#BFB8AB", "#DAD5CA", "#EDE9DF", "#F6F3EA"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "깨끗한 표면",
+        "canonical": "#FFFDF8",
+        "tonalRamp": ["#292823", "#4E4C45", "#74716A", "#9C9991", "#C3C0B8", "#DFDCD5", "#F1EFEA", "#FFFDF8"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "본문 잉크",
+        "canonical": "#1C2420",
+        "tonalRamp": ["#080B09", "#111713", "#1C2420", "#3D4641", "#626B66", "#929A95", "#C8CDC9", "#F1F3F1"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "보조 잉크",
+        "canonical": "#6D6F69",
+        "tonalRamp": ["#171814", "#2D2E29", "#474843", "#6D6F69", "#8F918B", "#B3B5AF", "#D8D9D5", "#F4F5F2"]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "종이 선",
+        "canonical": "#D8D2C5",
+        "tonalRamp": ["#27241E", "#4D483E", "#746E61", "#9C9587", "#BDB6A8", "#D8D2C5", "#E9E5DC", "#F8F6F1"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "질문", "purpose": "세션의 한 질문과 완료 문장" },
+      "body": { "displayName": "설명", "purpose": "맥락, 도움말, 사용자 답변" },
+      "label": { "displayName": "행동", "purpose": "버튼, 진행 정보, 필드 이름" }
+    },
+    "shadows": [
+      { "name": "workspace", "value": "0 28px 90px rgba(5, 22, 17, .34)", "purpose": "960px 이상에서 전체 종이 작업대를 배경과 분리" },
+      { "name": "dialog", "value": "0 24px 64px rgba(5, 25, 19, .32)", "purpose": "안전 안내 대화상자를 현재 화면과 분리" }
+    ],
+    "motion": [
+      { "name": "ease-fold", "value": "cubic-bezier(.22, 1, .36, 1)", "purpose": "질문이 한 장씩 펼쳐지는 전환" },
+      { "name": "state-fast", "value": "180ms ease", "purpose": "버튼, 칩, 선택 상태 피드백" }
+    ],
+    "breakpoints": [
+      { "name": "compact-phone", "value": "380px" },
+      { "name": "context-rail", "value": "960px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "한 화면의 다음 단계 하나를 나타내는 주요 행동",
+      "html": "<button class=\"ds-btn-primary\">다음으로</button>",
+      "css": ".ds-btn-primary{min-height:54px;padding:14px 18px;border:1px solid #173D33;border-radius:14px;background:#173D33;color:#FFFDF8;font:700 15px/1.5 'Noto Sans KR',sans-serif;transition:background-color 180ms ease,transform 180ms ease}.ds-btn-primary:hover{background:#2E5A4D}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:3px solid #F07A5F;outline-offset:3px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "주요 흐름을 방해하지 않는 이전·건너뛰기 행동",
+      "html": "<button class=\"ds-btn-secondary\">건너뛰기</button>",
+      "css": ".ds-btn-secondary{min-height:54px;padding:14px 18px;border:1px solid #D8D2C5;border-radius:14px;background:transparent;color:#173D33;font:700 15px/1.5 'Noto Sans KR',sans-serif;transition:border-color 180ms ease,background-color 180ms ease}.ds-btn-secondary:hover{border-color:#2E5A4D;background:#FFFDF8}.ds-btn-secondary:focus-visible{outline:3px solid #F07A5F;outline-offset:3px}"
+    },
+    {
+      "name": "Choice Card",
+      "kind": "card",
+      "refersTo": "choice",
+      "description": "사용자의 의도나 다음 행동을 한 문장으로 선택하는 카드",
+      "html": "<button class=\"ds-choice\"><strong>엉킨 마음을 정리하고 싶어요</strong><span>무엇이 가장 크게 남았는지 살펴봐요.</span></button>",
+      "css": ".ds-choice{display:grid;width:100%;gap:5px;padding:15px 16px;border:1px solid #D8D2C5;border-radius:14px;background:#FFFDF8;color:#1C2420;text-align:left;font-family:'Noto Sans KR',sans-serif;transition:border-color 180ms ease,background-color 180ms ease}.ds-choice strong{font-size:15px}.ds-choice span{color:#6D6F69;font-size:13px}.ds-choice:hover{border-color:#2E5A4D}.ds-choice:focus-visible{outline:3px solid #F07A5F;outline-offset:3px}"
+    },
+    {
+      "name": "Emotion Chip",
+      "kind": "chip",
+      "description": "감정과 중요했던 마음을 여러 개 선택하는 짧은 단어 컨트롤",
+      "html": "<button class=\"ds-chip\" aria-pressed=\"true\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m6.5 12.5 3.4 3.4 7.6-8\"/></svg>서운함</button>",
+      "css": ".ds-chip{display:inline-flex;min-height:44px;align-items:center;gap:7px;padding:9px 13px;border:1px solid #2E5A4D;border-radius:999px;background:#DCE6DF;color:#173D33;font:700 14px/1.4 'Noto Sans KR',sans-serif}.ds-chip svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}.ds-chip:focus-visible{outline:3px solid #F07A5F;outline-offset:3px}"
+    },
+    {
+      "name": "Reflection Field",
+      "kind": "input",
+      "description": "정리하지 않은 말을 넉넉하게 적는 밑줄형 텍스트 영역",
+      "html": "<label class=\"ds-field\"><span>내가 겪은 일</span><textarea placeholder=\"떠오르는 순서대로 적어주세요\"></textarea></label>",
+      "css": ".ds-field{display:grid;gap:8px;color:#1C2420;font:700 13px/1.5 'Noto Sans KR',sans-serif}.ds-field textarea{min-height:128px;padding:14px 2px;border:0;border-bottom:1px solid #D8D2C5;border-radius:0;background:transparent;color:#1C2420;font:400 16px/1.8 'Noto Sans KR',sans-serif;resize:vertical}.ds-field textarea:focus{border-color:#173D33;outline:3px solid #F07A5F;outline-offset:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "접힌 마음 지도",
+    "overview": "Re:Mind의 화면은 상담 채팅창이 아니라, 사용자가 자기 말을 한 장씩 펼쳐보는 조용한 작업대다. 따뜻한 종이색 위에 짙은 녹색 잉크를 놓고 산호색은 진행과 선택을 확인하는 작은 표시로만 사용한다.",
+    "keyCharacteristics": ["따뜻한 종이 바탕과 차분한 녹색 잉크", "한 번에 한 질문만 펼쳐지는 낮은 인지 부하", "사람의 말이 중심인 비채팅형 구조", "결정권과 안전을 분명히 남기는 인터랙션"],
+    "rules": [
+      { "name": "Quiet Accent", "body": "산호색은 한 화면의 작은 신호에만 사용한다.", "section": "colors" },
+      { "name": "Human Sentence", "body": "제목은 사용자가 스스로 답할 수 있는 질문 또는 선택권을 남기는 문장이어야 한다.", "section": "typography" },
+      { "name": "Flat by Default", "body": "깊이는 구조가 바뀌는 표면에만 허용한다.", "section": "elevation" }
+    ],
+    "dos": ["Do 한 화면에 하나의 질문과 하나의 주요 행동만 둔다.", "Do 안전 안내와 종료 경로를 어느 단계에서도 찾을 수 있게 한다."],
+    "donts": ["Don't 상담사 아바타, 채팅 말풍선, AI 반짝이 아이콘으로 화면을 꾸미지 않는다.", "Don't 사용자가 말하지 않은 감정·의도·진단을 결과에 추가하지 않는다."]
+  }
+}

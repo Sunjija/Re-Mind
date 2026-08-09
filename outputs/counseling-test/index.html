@@ -1,0 +1,1772 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#173d33" />
+  <meta name="description" content="Re:Mind 마음 정리 세션 — 복잡한 마음을 한 질문씩 천천히 살펴봅니다." />
+  <title>마음 정리하기 · Re:Mind</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f6f3ea;
+      --paper-deep: #ede8dc;
+      --surface: #fffdf8;
+      --ink: #1c2420;
+      --muted: #6d6f69;
+      --line: #d8d2c5;
+      --green: #173d33;
+      --green-mid: #2e5a4d;
+      --green-soft: #dce6df;
+      --orange: #d9553a;
+      --orange-deep: #a83d29;
+      --orange-soft: #f5ded5;
+      --danger: #a7352a;
+      --danger-soft: #f6e2dd;
+      --focus: #f07a5f;
+      --sans: "Noto Sans KR", "Pretendard", "SUIT", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      --serif: "Gowun Batang", "Noto Serif KR", "KoPub Batang", serif;
+      --ease: cubic-bezier(.22, 1, .36, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      min-width: 320px;
+      background: var(--green);
+      overscroll-behavior: none;
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100dvh;
+      margin: 0;
+      overflow-x: hidden;
+      background: var(--green);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button,
+    a,
+    input[type="range"] {
+      touch-action: manipulation;
+    }
+
+    button { cursor: pointer; }
+
+    ::selection {
+      background: var(--orange-soft);
+      color: var(--green);
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .app-shell {
+      min-height: 100dvh;
+      background: var(--paper);
+    }
+
+    .context-rail {
+      display: none;
+    }
+
+    .work-area {
+      position: relative;
+      display: flex;
+      min-height: 100dvh;
+      flex-direction: column;
+      background: var(--paper);
+    }
+
+    .mobile-bar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      min-height: 68px;
+      align-items: center;
+      justify-content: space-between;
+      padding: max(12px, env(safe-area-inset-top)) 20px 10px;
+      border-bottom: 1px solid rgba(23, 61, 51, .14);
+      background: rgba(246, 243, 234, .96);
+    }
+
+    .brand {
+      color: var(--green);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -.03em;
+    }
+
+    .progress-label {
+      color: var(--green-mid);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .progress-track {
+      position: absolute;
+      right: 0;
+      bottom: -1px;
+      left: 0;
+      height: 2px;
+      overflow: hidden;
+      background: var(--paper-deep);
+    }
+
+    .progress-fill {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: var(--orange);
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 240ms var(--ease);
+    }
+
+    .screen-wrap {
+      display: flex;
+      width: min(100%, 720px);
+      min-height: calc(100dvh - 68px);
+      margin: 0 auto;
+      flex: 1;
+      flex-direction: column;
+      padding: 30px 20px max(24px, env(safe-area-inset-bottom));
+    }
+
+    .top-actions {
+      display: flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .back-button,
+    .quiet-button,
+    .text-button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      gap: 8px;
+      border: 0;
+      background: transparent;
+      color: var(--green-mid);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .back-button {
+      margin-left: -10px;
+      padding: 8px 10px;
+    }
+
+    .back-button svg,
+    .text-button svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .session-content {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      animation: content-in 360ms var(--ease) both;
+    }
+
+    @keyframes content-in {
+      from { opacity: 0; transform: translateY(10px); clip-path: inset(0 0 8% 0); }
+      to { opacity: 1; transform: translateY(0); clip-path: inset(0); }
+    }
+
+    .question {
+      max-width: 650px;
+      margin: 8px 0 14px;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(29px, 8vw, 43px);
+      font-weight: 700;
+      letter-spacing: -.025em;
+      line-height: 1.35;
+      text-wrap: balance;
+      word-break: keep-all;
+    }
+
+    .question.compact {
+      font-size: clamp(27px, 7.2vw, 39px);
+    }
+
+    .lead {
+      max-width: 610px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.75;
+      word-break: keep-all;
+    }
+
+    .privacy-note,
+    .context-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .privacy-note {
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .privacy-note svg,
+    .context-note svg {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+    }
+
+    .choice-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .choice {
+      position: relative;
+      display: flex;
+      width: 100%;
+      min-height: 62px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 15px 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+      transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+    }
+
+    .choice:hover {
+      border-color: rgba(23, 61, 51, .55);
+      background: rgba(255, 253, 248, .58);
+    }
+
+    .choice[aria-pressed="true"],
+    .choice.selected {
+      border-color: var(--green);
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .choice-copy {
+      display: grid;
+      gap: 3px;
+    }
+
+    .choice-title {
+      font-weight: 600;
+      letter-spacing: -.01em;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .choice-detail {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .choice-mark {
+      display: grid;
+      width: 23px;
+      height: 23px;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid #b9b5aa;
+      border-radius: 50%;
+      color: transparent;
+      transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+    }
+
+    .choice[aria-pressed="true"] .choice-mark,
+    .choice.selected .choice-mark {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--paper);
+    }
+
+    .choice-mark svg {
+      width: 13px;
+      height: 13px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 2.4;
+    }
+
+    .field {
+      margin-top: 30px;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .field-helper {
+      display: block;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    textarea,
+    .text-input {
+      width: 100%;
+      border: 0;
+      border-bottom: 1px solid #a9a398;
+      border-radius: 0;
+      background: transparent;
+      color: var(--ink);
+      caret-color: var(--orange);
+      font-size: 18px;
+      line-height: 1.75;
+      transition: border-color 180ms ease, background-color 180ms ease;
+    }
+
+    textarea {
+      min-height: 158px;
+      resize: vertical;
+      padding: 14px 2px 18px;
+    }
+
+    .text-input {
+      min-height: 54px;
+      padding: 10px 2px 12px;
+    }
+
+    textarea::placeholder,
+    .text-input::placeholder {
+      color: #8f8a80;
+      opacity: 1;
+    }
+
+    textarea:focus,
+    .text-input:focus {
+      border-color: var(--green);
+      outline: none;
+      background: rgba(255, 253, 248, .45);
+    }
+
+    .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 26px;
+    }
+
+    .chip {
+      min-height: 46px;
+      padding: 10px 15px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 600;
+      transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+    }
+
+    .chip:hover { border-color: rgba(23, 61, 51, .55); }
+
+    .chip[aria-pressed="true"] {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--paper);
+    }
+
+    .range-block {
+      margin-top: 42px;
+      padding: 24px 0 18px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .range-reading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      color: var(--green);
+    }
+
+    .range-value {
+      font-family: var(--serif);
+      font-size: 52px;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .range-unit {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 28px;
+      margin: 0;
+      appearance: none;
+      background: transparent;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(to right, var(--green) 0 var(--range-progress, 50%), #c9c3b8 var(--range-progress, 50%) 100%);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      width: 26px;
+      height: 26px;
+      margin-top: -11px;
+      appearance: none;
+      border: 2px solid var(--paper);
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 4px;
+      border-radius: 2px;
+      background: #c9c3b8;
+    }
+
+    input[type="range"]::-moz-range-progress {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--green);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--paper);
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+    }
+
+    .range-ends {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .action-zone {
+      display: grid;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 34px;
+    }
+
+    .primary-button,
+    .secondary-button {
+      display: inline-flex;
+      width: 100%;
+      min-height: 54px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 13px 18px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+    }
+
+    .primary-button {
+      border: 1px solid var(--green);
+      background: var(--green);
+      color: var(--paper);
+    }
+
+    .primary-button:hover:not(:disabled) { background: #214b40; }
+
+    .primary-button:active:not(:disabled),
+    .secondary-button:active:not(:disabled) { transform: translateY(1px); }
+
+    .primary-button:disabled {
+      border-color: #b9b5aa;
+      background: #d6d1c6;
+      color: #77746c;
+      cursor: not-allowed;
+    }
+
+    .secondary-button {
+      border: 1px solid #a7a196;
+      background: transparent;
+      color: var(--green);
+    }
+
+    .secondary-button:hover { background: rgba(255, 253, 248, .58); }
+
+    .safety-button {
+      min-height: 44px;
+      justify-self: center;
+      padding: 8px 10px;
+      border: 0;
+      background: transparent;
+      color: #756d65;
+      font-size: 13px;
+      text-decoration: underline;
+      text-decoration-color: rgba(117, 109, 101, .45);
+      text-underline-offset: 4px;
+    }
+
+    .pause-panel {
+      margin-top: 30px;
+      padding: 24px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pause-prompt {
+      margin: 0;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .pause-instruction {
+      margin: 10px 0 0;
+      color: var(--muted);
+    }
+
+    .pause-timer {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-top: 22px;
+    }
+
+    .timer-line {
+      height: 3px;
+      flex: 1;
+      overflow: hidden;
+      border-radius: 2px;
+      background: #cbc5ba;
+    }
+
+    .timer-line span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--orange);
+    }
+
+    .timer-line.running span { animation: timer-run 20s linear forwards; }
+
+    @keyframes timer-run { to { width: 100%; } }
+
+    .timer-number {
+      min-width: 44px;
+      color: var(--green);
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .mind-map {
+      margin-top: 26px;
+      border-top: 1px solid var(--green);
+    }
+
+    .map-row {
+      display: grid;
+      grid-template-columns: minmax(84px, 24%) 1fr auto;
+      gap: 14px;
+      align-items: start;
+      padding: 17px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .map-label {
+      color: var(--green-mid);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .map-value {
+      margin: 0;
+      color: var(--ink);
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .edit-button {
+      min-width: 44px;
+      min-height: 44px;
+      margin: -9px -8px -9px 0;
+      padding: 8px;
+      border: 0;
+      background: transparent;
+      color: var(--green-mid);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .result-sheet {
+      margin-top: 28px;
+      border-top: 1px solid var(--green);
+      border-bottom: 1px solid var(--green);
+    }
+
+    .result-line {
+      display: grid;
+      gap: 6px;
+      padding: 19px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .result-line:last-child { border-bottom: 0; }
+
+    .result-line dt {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .result-line dd {
+      margin: 0;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .feedback-grid {
+      display: grid;
+      gap: 24px;
+      margin-top: 30px;
+    }
+
+    .feedback-item {
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .feedback-item legend {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 0;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.55;
+    }
+
+    .scale-options {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+    }
+
+    .scale-option {
+      position: relative;
+      display: grid;
+      min-width: 44px;
+      min-height: 46px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .scale-option input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .scale-option:has(input:checked) {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--paper);
+    }
+
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .status-message {
+      min-height: 24px;
+      margin: 8px 0 0;
+      color: var(--green-mid);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    dialog {
+      width: min(calc(100% - 32px), 540px);
+      max-height: calc(100dvh - 32px);
+      padding: 0;
+      overflow: auto;
+      border: 0;
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: 0 24px 64px rgba(5, 25, 19, .32);
+    }
+
+    dialog::backdrop {
+      background: rgba(10, 31, 25, .68);
+    }
+
+    .dialog-body { padding: 26px 22px max(22px, env(safe-area-inset-bottom)); }
+
+    .dialog-title {
+      margin: 0;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    .dialog-copy {
+      margin: 12px 0 0;
+      color: var(--muted);
+      word-break: keep-all;
+    }
+
+    .support-list {
+      display: grid;
+      gap: 9px;
+      margin: 22px 0 0;
+    }
+
+    .support-link {
+      display: flex;
+      min-height: 54px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      color: var(--green);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .support-link span:last-child {
+      color: var(--orange-deep);
+      font-size: 13px;
+    }
+
+    .dialog-actions {
+      display: grid;
+      gap: 9px;
+      margin-top: 22px;
+    }
+
+    .risk-copy {
+      margin-top: 18px;
+      padding: 15px;
+      border: 1px solid #d9aaa0;
+      border-radius: 12px;
+      background: var(--danger-soft);
+      color: #703028;
+      font-size: 14px;
+    }
+
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    @media (min-width: 960px) {
+      body { padding: 28px; }
+
+      .app-shell {
+        display: grid;
+        width: min(1120px, 100%);
+        min-height: min(820px, calc(100dvh - 56px));
+        margin: 0 auto;
+        grid-template-columns: 300px minmax(0, 1fr);
+        overflow: hidden;
+        border-radius: 18px;
+        box-shadow: 0 28px 90px rgba(5, 22, 17, .34);
+      }
+
+      .context-rail {
+        display: flex;
+        min-height: 100%;
+        flex-direction: column;
+        padding: 38px 32px 30px;
+        background: var(--green);
+        color: var(--paper);
+      }
+
+      .rail-brand {
+        color: var(--paper);
+        font-size: 21px;
+        font-weight: 700;
+        letter-spacing: -.03em;
+      }
+
+      .rail-copy {
+        margin: 34px 0 0;
+        color: rgba(246, 243, 234, .72);
+        font-family: var(--serif);
+        font-size: 21px;
+        line-height: 1.7;
+        word-break: keep-all;
+      }
+
+      .fold-progress {
+        display: grid;
+        gap: 0;
+        margin-top: 38px;
+        border-top: 1px solid rgba(246, 243, 234, .22);
+      }
+
+      .fold-step {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 10px;
+        align-items: center;
+        min-height: 48px;
+        border-bottom: 1px solid rgba(246, 243, 234, .16);
+        color: rgba(246, 243, 234, .46);
+        font-size: 13px;
+        transition: color 180ms ease;
+      }
+
+      .fold-step::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border: 1px solid currentColor;
+        transform: rotate(45deg);
+        transition: background-color 180ms ease, border-color 180ms ease;
+      }
+
+      .fold-step.done,
+      .fold-step.current { color: var(--paper); }
+
+      .fold-step.done::before { background: var(--orange); border-color: var(--orange); }
+      .fold-step.current::before { border-color: #f18d75; }
+
+      .rail-bottom {
+        margin-top: auto;
+        padding-top: 28px;
+      }
+
+      .rail-safety {
+        min-height: 44px;
+        margin-left: -10px;
+        padding: 8px 10px;
+        border: 0;
+        background: transparent;
+        color: rgba(246, 243, 234, .68);
+        font-size: 13px;
+        text-align: left;
+        text-decoration: underline;
+        text-decoration-color: rgba(246, 243, 234, .25);
+        text-underline-offset: 4px;
+      }
+
+      .rail-privacy {
+        margin: 12px 0 0;
+        color: rgba(246, 243, 234, .5);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .work-area { min-height: min(820px, calc(100dvh - 56px)); }
+      .mobile-bar { display: none; }
+
+      .screen-wrap {
+        width: 100%;
+        min-height: 100%;
+        padding: 42px clamp(44px, 7vw, 76px) 38px;
+      }
+
+      .question { font-size: clamp(38px, 4.2vw, 52px); }
+      .question.compact { font-size: clamp(34px, 3.8vw, 46px); }
+      .lead { font-size: 17px; }
+
+      .action-zone {
+        grid-template-columns: minmax(190px, 260px) minmax(120px, 190px);
+        justify-content: end;
+      }
+
+      .action-zone .primary-button { grid-column: 2; }
+      .action-zone .secondary-button { grid-column: 1; grid-row: 1; }
+      .action-zone .safety-button { display: none; }
+
+      .choice-list { max-width: 650px; }
+      .choice { min-height: 66px; padding: 16px 18px; }
+    }
+
+    @media (max-width: 959px) {
+      .action-zone.sticky-mobile {
+        position: sticky;
+        z-index: 3;
+        bottom: 0;
+        margin-right: -20px;
+        margin-left: -20px;
+        padding: 18px 20px max(12px, env(safe-area-inset-bottom));
+        background: linear-gradient(to bottom, rgba(246, 243, 234, 0), var(--paper) 18px);
+      }
+    }
+
+    @media (max-width: 380px) {
+      .screen-wrap { padding-right: 17px; padding-left: 17px; }
+      .action-zone.sticky-mobile {
+        margin-right: -17px;
+        margin-left: -17px;
+        padding-right: 17px;
+        padding-left: 17px;
+      }
+      .question { font-size: 28px; }
+      .choice { padding-right: 14px; padding-left: 14px; }
+      .map-row { grid-template-columns: 74px 1fr auto; gap: 9px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!--
+    THESIS: 답할수록 한 장의 마음 지도가 펼쳐진다. 상담 채팅창과 말풍선 배열을 거부한다.
+    OWN-WORLD: 따뜻한 종이 바탕, 짙은 녹색 잉크, 산호색 선택 신호, 얇은 접힘선으로 이루어진 조용한 작업면.
+    STORY: 사용자는 정리되지 않은 일을 꺼내고, 핵심 장면과 감정과 의미를 구분한 뒤, 자기 말로 된 지도를 확인하고 다음을 직접 고른다.
+    FIRST VIEWPORT: 모바일은 한 장의 종이 위에 큰 질문과 한 개의 시작 행동, PC는 녹색 맥락 레일과 넓은 종이 작업면으로 시작한다.
+    FORM: progressive folding field, grounded candidate 7, seed 718bd570.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+  -->
+  <div class="app-shell" id="app">
+    <aside class="context-rail" aria-label="세션 진행 상황">
+      <div class="rail-brand">Re:Mind</div>
+      <p class="rail-copy">마음을 서둘러 결론 내리지 않고,<br />한 질문씩 살펴봅니다.</p>
+      <div class="fold-progress" id="fold-progress" aria-hidden="true"></div>
+      <div class="rail-bottom">
+        <button class="rail-safety" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+        <p class="rail-privacy">이 테스트는 입력 내용을 서버에 보내거나 저장하지 않습니다.</p>
+      </div>
+    </aside>
+
+    <main class="work-area">
+      <header class="mobile-bar">
+        <span class="brand">Re:Mind</span>
+        <span class="progress-label" id="mobile-progress-label">마음 정리 시작</span>
+        <span class="progress-track" aria-hidden="true"><span class="progress-fill" id="progress-fill"></span></span>
+      </header>
+
+      <div class="screen-wrap" id="screen-wrap">
+        <div class="top-actions" id="top-actions"></div>
+        <section class="session-content" id="session-content" aria-live="polite"></section>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="safety-dialog" aria-labelledby="safety-title">
+    <div class="dialog-body">
+      <h2 class="dialog-title" id="safety-title">지금은 마음 정리보다 안전이 먼저예요.</h2>
+      <p class="dialog-copy">지금 바로 자신이나 다른 사람이 다칠 가능성이 있거나, 폭력·협박 때문에 안전하지 않다면 이 테스트가 상황을 판단하거나 해결할 수 없어요. 혼자 감당하지 말고 지금 연결할 수 있는 사람과 기관에 연락해 주세요.</p>
+      <div class="support-list">
+        <a class="support-link" href="tel:112"><span>경찰 신고</span><span>112 전화</span></a>
+        <a class="support-link" href="tel:119"><span>응급·구조</span><span>119 전화</span></a>
+        <a class="support-link" href="tel:129"><span>보건복지상담센터</span><span>129 전화</span></a>
+        <a class="support-link" href="https://www.129.go.kr/counsel/counsel01.do" target="_blank" rel="noreferrer"><span>상담 지원 정보 확인</span><span>공식 사이트</span></a>
+      </div>
+      <div class="dialog-actions">
+        <button class="primary-button" type="button" data-close-safety>지금 연락할 곳을 확인했어요</button>
+        <button class="secondary-button" type="button" data-close-safety>닫기</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="risk-dialog" aria-labelledby="risk-title">
+    <div class="dialog-body">
+      <h2 class="dialog-title" id="risk-title">적어준 내용에서 안전이 걱정되는 표현이 보였어요.</h2>
+      <p class="dialog-copy">지금 자신이나 다른 사람이 곧 다칠 가능성이 있거나, 누군가의 폭력·협박 때문에 안전하지 않은가요?</p>
+      <p class="risk-copy">이 확인은 정확한 위험 평가가 아니에요. 조금이라도 당장 위험하다고 느껴진다면 안전 안내를 먼저 확인해 주세요.</p>
+      <div class="dialog-actions">
+        <button class="primary-button" type="button" id="risk-yes">네, 지금 도움이 필요해요</button>
+        <button class="secondary-button" type="button" id="risk-no">지금 당장 위험하지는 않아요</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const checkIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.5 12.5 3.4 3.4 7.6-8"/></svg>';
+      const backIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>';
+      const lockIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>';
+
+      const goalOptions = [
+        { value: '엉킨 마음을 정리하고 싶어요', detail: '무엇이 가장 크게 남았는지 살펴봐요.' },
+        { value: '왜 이렇게 마음이 쓰이는지 알고 싶어요', detail: '감정 아래에 중요했던 마음을 찾아봐요.' },
+        { value: '지금 할 수 있는 일을 찾고 싶어요', detail: '서두르지 않고 다음 한 걸음을 골라봐요.' },
+        { value: '정답 없이 그냥 꺼내놓고 싶어요', detail: '결론을 내리지 않아도 괜찮아요.' }
+      ];
+
+      const emotions = ['서운함', '화남', '불안함', '외로움', '답답함', '허탈함', '두려움', '미안함', '혼란스러움', '잘 모르겠음'];
+      const needs = ['존중', '신뢰', '안정', '이해', '관심', '자유', '약속', '솔직함', '연결감', '잘 모르겠음'];
+      const nextOptions = [
+        { value: '오늘은 여기서 멈추고 쉬기', detail: '지금 당장 해결하지 않아도 괜찮아요.' },
+        { value: '조금 더 생각해 볼 질문 하나 남기기', detail: '나중에 다시 볼 작은 질문만 가져가요.' },
+        { value: '믿을 만한 사람에게 말해보기', detail: '혼자만의 생각에서 잠시 나와요.' },
+        { value: '상대와 이야기할 시점 정하기', detail: '무엇을 말할지보다 언제 말할지부터 골라요.' },
+        { value: '전문가의 도움 알아보기', detail: '혼자 정리하기 어려운 마음을 사람과 나눠요.' }
+      ];
+
+      const stageLabels = ['시작', '꺼내보기', '알아보기', '정리하기', '마무리'];
+      const riskPattern = /(죽고\s*싶|자살|해치고|죽여|폭력|맞았|때렸|협박|감금|스토킹|따라다니|안전하지|흉기|칼로)/i;
+
+      const state = {
+        step: 0,
+        startedAt: Date.now(),
+        goal: '',
+        clarityBefore: 4,
+        story: '',
+        moment: '',
+        emotions: [],
+        customEmotion: '',
+        intensity: 5,
+        meaning: '',
+        needs: [],
+        customNeed: '',
+        nextChoice: '',
+        clarityAfter: 5,
+        feedback: { understood: 0, inferred: 0, agency: 0 },
+        comment: '',
+        riskChecked: false,
+        pauseCompleted: false,
+        returnToMap: false
+      };
+
+      const screens = [
+        { id: 'welcome', stage: 0, render: renderWelcome },
+        { id: 'goal', stage: 0, render: renderGoal },
+        { id: 'clarity-before', stage: 0, render: renderClarityBefore },
+        { id: 'story', stage: 1, render: renderStory },
+        { id: 'moment', stage: 1, render: renderMoment },
+        { id: 'emotion', stage: 2, render: renderEmotion },
+        { id: 'intensity', stage: 2, render: renderIntensity },
+        { id: 'pause', stage: 2, render: renderPause, conditional: () => state.intensity >= 8 },
+        { id: 'meaning', stage: 2, render: renderMeaning },
+        { id: 'need', stage: 2, render: renderNeed },
+        { id: 'map', stage: 3, render: renderMap },
+        { id: 'next', stage: 3, render: renderNext },
+        { id: 'clarity-after', stage: 4, render: renderClarityAfter },
+        { id: 'feedback', stage: 4, render: renderFeedback },
+        { id: 'done', stage: 4, render: renderDone }
+      ];
+
+      const content = document.getElementById('session-content');
+      const topActions = document.getElementById('top-actions');
+      const progressFill = document.getElementById('progress-fill');
+      const progressLabel = document.getElementById('mobile-progress-label');
+      const foldProgress = document.getElementById('fold-progress');
+      const safetyDialog = document.getElementById('safety-dialog');
+      const riskDialog = document.getElementById('risk-dialog');
+
+      function escapeHtml(value) {
+        return String(value ?? '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      function activeScreenIndexes() {
+        return screens.map((screen, index) => ({ screen, index }))
+          .filter(({ screen }) => !screen.conditional || screen.conditional())
+          .map(({ index }) => index);
+      }
+
+      function progressInfo() {
+        const active = activeScreenIndexes();
+        const position = Math.max(0, active.indexOf(state.step));
+        const meaningfulTotal = active.length - 2;
+        const meaningfulPosition = Math.max(0, Math.min(meaningfulTotal, position));
+        return {
+          percent: meaningfulTotal ? Math.round((meaningfulPosition / meaningfulTotal) * 100) : 0,
+          label: state.step === 0 ? '마음 정리 시작' : `${meaningfulPosition} / ${meaningfulTotal}`
+        };
+      }
+
+      function renderProgress() {
+        const info = progressInfo();
+        progressFill.style.transform = `scaleX(${info.percent / 100})`;
+        progressLabel.textContent = info.label;
+        const currentStage = screens[state.step].stage;
+        foldProgress.innerHTML = stageLabels.map((label, index) => {
+          const className = index < currentStage ? 'done' : (index === currentStage ? 'current' : '');
+          return `<div class="fold-step ${className}">${label}</div>`;
+        }).join('');
+      }
+
+      function renderTopActions() {
+        if (state.step === 0 || screens[state.step].id === 'done') {
+          topActions.innerHTML = '<span></span><span></span>';
+          return;
+        }
+        topActions.innerHTML = `<button class="back-button" type="button" id="back-button">${backIcon}<span>이전</span></button><span></span>`;
+        document.getElementById('back-button').addEventListener('click', goBack);
+      }
+
+      function render(pushHistory = false) {
+        const screen = screens[state.step];
+        renderProgress();
+        renderTopActions();
+        content.classList.remove('session-content');
+        void content.offsetWidth;
+        content.classList.add('session-content');
+        screen.render();
+        if (pushHistory) {
+          history.pushState({ step: state.step }, '', `#${screen.id}`);
+        } else {
+          history.replaceState({ step: state.step }, '', `#${screen.id}`);
+        }
+        document.getElementById('screen-wrap').scrollTo({ top: 0, behavior: 'instant' });
+        requestAnimationFrame(() => {
+          const heading = content.querySelector('h1');
+          if (heading && state.step > 0) heading.focus({ preventScroll: true });
+        });
+      }
+
+      function getNextIndex(from = state.step) {
+        let index = from + 1;
+        while (index < screens.length && screens[index].conditional && !screens[index].conditional()) index += 1;
+        return Math.min(index, screens.length - 1);
+      }
+
+      function getPreviousIndex(from = state.step) {
+        let index = from - 1;
+        while (index > 0 && screens[index].conditional && !screens[index].conditional()) index -= 1;
+        return Math.max(index, 0);
+      }
+
+      function goNext() {
+        if (state.returnToMap && screens[state.step].id !== 'map') {
+          state.returnToMap = false;
+          state.step = screens.findIndex(screen => screen.id === 'map');
+        } else {
+          state.step = getNextIndex();
+        }
+        render(true);
+      }
+
+      function goBack() {
+        history.back();
+      }
+
+      function jumpTo(screenId, returnToMap = false) {
+        const index = screens.findIndex(screen => screen.id === screenId);
+        if (index < 0) return;
+        state.returnToMap = returnToMap;
+        state.step = index;
+        render(true);
+      }
+
+      function choiceMarkup(options, selected, multi = false) {
+        const selection = multi ? selected : [selected];
+        return options.map(option => {
+          const item = typeof option === 'string' ? { value: option, detail: '' } : option;
+          const isSelected = selection.includes(item.value);
+          return `<button class="choice" type="button" data-choice="${escapeHtml(item.value)}" aria-pressed="${isSelected}">
+            <span class="choice-copy"><span class="choice-title">${escapeHtml(item.value)}</span>${item.detail ? `<span class="choice-detail">${escapeHtml(item.detail)}</span>` : ''}</span>
+            <span class="choice-mark" aria-hidden="true">${checkIcon}</span>
+          </button>`;
+        }).join('');
+      }
+
+      function chipMarkup(options, selected) {
+        return options.map(value => `<button class="chip" type="button" data-chip="${escapeHtml(value)}" aria-pressed="${selected.includes(value)}">${escapeHtml(value)}</button>`).join('');
+      }
+
+      function bindSingleChoice(key, buttonId) {
+        content.querySelectorAll('[data-choice]').forEach(button => {
+          button.addEventListener('click', () => {
+            state[key] = button.dataset.choice;
+            content.querySelectorAll('[data-choice]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+            document.getElementById(buttonId).disabled = false;
+          });
+        });
+      }
+
+      function bindMultiChips(key, buttonId) {
+        content.querySelectorAll('[data-chip]').forEach(button => {
+          button.addEventListener('click', () => {
+            const value = button.dataset.chip;
+            const selected = state[key];
+            const nextSelected = selected.includes(value)
+              ? selected.filter(item => item !== value)
+              : [...selected, value];
+            state[key] = nextSelected;
+            button.setAttribute('aria-pressed', String(nextSelected.includes(value)));
+            document.getElementById(buttonId).disabled = nextSelected.length === 0 && !state[key === 'emotions' ? 'customEmotion' : 'customNeed'].trim();
+          });
+        });
+      }
+
+      function updateRangeVisual(input) {
+        const min = Number(input.min || 0);
+        const max = Number(input.max || 10);
+        const value = Number(input.value);
+        const percent = ((value - min) / (max - min)) * 100;
+        input.style.setProperty('--range-progress', `${percent}%`);
+      }
+
+      function checkRiskBeforeContinue(text) {
+        if (!state.riskChecked && riskPattern.test(text)) {
+          riskDialog.showModal();
+          return true;
+        }
+        return false;
+      }
+
+      function renderWelcome() {
+        content.innerHTML = `
+          <h1 class="question" tabindex="-1">말을 잘 고르지 않아도 괜찮아요.</h1>
+          <p class="lead">지금 마음에 걸리는 일을 한 질문씩 천천히 따라가 볼게요. 답하기 어려운 질문은 건너뛰어도 돼요.</p>
+          <div class="privacy-note">${lockIcon}<span>작성한 내용은 이 기기에만 잠시 머물고, 서버로 전송되지 않아요. 새로고침하면 모두 사라집니다.</span></div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="start-button">내 마음부터 살펴보기</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험하거나 안전하지 않다면</button>
+          </div>`;
+        document.getElementById('start-button').addEventListener('click', () => {
+          state.startedAt = Date.now();
+          goNext();
+        });
+        bindSafetyButtons();
+      }
+
+      function renderGoal() {
+        content.innerHTML = `
+          <h1 class="question compact" tabindex="-1">오늘 이 시간이 끝났을 때, 무엇이 조금 더 선명해졌으면 하나요?</h1>
+          <p class="lead">가장 가까운 것을 하나 골라주세요. 도중에 마음이 달라져도 괜찮아요.</p>
+          <div class="choice-list">${choiceMarkup(goalOptions, state.goal)}</div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="goal-next" ${state.goal ? '' : 'disabled'}>이 마음으로 시작할게요</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        bindSingleChoice('goal', 'goal-next');
+        document.getElementById('goal-next').addEventListener('click', goNext);
+        bindSafetyButtons();
+      }
+
+      function renderClarityBefore() {
+        content.innerHTML = `
+          <h1 class="question" tabindex="-1">지금은 내 마음을 얼마나 알고 있는 것 같나요?</h1>
+          <p class="lead">정확하게 재려는 질문은 아니에요. 지금 느낌에 가까운 숫자를 골라주세요.</p>
+          <div class="range-block">
+            <div class="range-reading"><span class="range-value" id="range-reading">${state.clarityBefore}</span><span class="range-unit">10점 중</span></div>
+            <label class="visually-hidden" for="clarity-before-range">시작 전 마음 명료도</label>
+            <input id="clarity-before-range" type="range" min="0" max="10" step="1" value="${state.clarityBefore}" />
+            <div class="range-ends"><span>잘 모르겠어요</span><span>꽤 분명해요</span></div>
+          </div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="clarity-before-next">이 정도예요</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        const range = document.getElementById('clarity-before-range');
+        updateRangeVisual(range);
+        range.addEventListener('input', () => {
+          state.clarityBefore = Number(range.value);
+          document.getElementById('range-reading').textContent = range.value;
+          updateRangeVisual(range);
+        });
+        document.getElementById('clarity-before-next').addEventListener('click', goNext);
+        bindSafetyButtons();
+      }
+
+      function renderStory() {
+        content.innerHTML = `
+          <h1 class="question" tabindex="-1">무슨 일이 있었나요?</h1>
+          <p class="lead">정리해서 설명하지 않아도 괜찮아요. 지금 떠오르는 순서대로 적어주세요.</p>
+          <div class="field">
+            <label class="field-label" for="story-input">내가 겪은 일</label>
+            <textarea id="story-input" maxlength="1200" placeholder="예: 어제 만나기로 했는데 갑자기 약속이 바뀌었어요…">${escapeHtml(state.story)}</textarea>
+            <span class="field-helper">상대에게 보여주기 위한 글이 아니니 표현을 다듬지 않아도 돼요.</span>
+          </div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="story-next" ${state.story.trim() ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '조금 더 살펴볼게요'}</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        const input = document.getElementById('story-input');
+        input.addEventListener('input', () => {
+          state.story = input.value;
+          document.getElementById('story-next').disabled = !state.story.trim();
+        });
+        document.getElementById('story-next').addEventListener('click', () => {
+          if (!checkRiskBeforeContinue(state.story)) goNext();
+        });
+        bindSafetyButtons();
+      }
+
+      function renderMoment() {
+        content.innerHTML = `
+          <h1 class="question" tabindex="-1">그중에서 자꾸 돌아오는 장면이 있나요?</h1>
+          <p class="lead">사건 전체보다 마음에 가장 오래 남은 순간 하나만 골라봐요.</p>
+          <div class="field">
+            <label class="field-label" for="moment-input">가장 마음에 남은 순간</label>
+            <textarea id="moment-input" maxlength="600" placeholder="예: 내 말을 듣기도 전에 괜찮다며 넘겼던 순간">${escapeHtml(state.moment)}</textarea>
+            <span class="field-helper">딱 떠오르는 장면이 없다면 “전체적으로 답답했다”처럼 적어도 괜찮아요.</span>
+          </div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="moment-next" ${state.moment.trim() ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '그때의 마음을 볼게요'}</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        const input = document.getElementById('moment-input');
+        input.addEventListener('input', () => {
+          state.moment = input.value;
+          document.getElementById('moment-next').disabled = !state.moment.trim();
+        });
+        document.getElementById('moment-next').addEventListener('click', () => {
+          if (!checkRiskBeforeContinue(state.moment)) goNext();
+        });
+        bindSafetyButtons();
+      }
+
+      function renderEmotion() {
+        content.innerHTML = `
+          <h1 class="question" tabindex="-1">그 장면에서 마음은 어떤 쪽에 가까웠나요?</h1>
+          <p class="lead">한 가지로 딱 맞지 않아도 괜찮아요. 가까운 감정을 여러 개 골라도 돼요.</p>
+          <div class="chip-grid" aria-label="감정 선택">${chipMarkup(emotions, state.emotions)}</div>
+          <div class="field">
+            <label class="field-label" for="custom-emotion">목록에 없는 마음이 있다면</label>
+            <input class="text-input" id="custom-emotion" maxlength="80" value="${escapeHtml(state.customEmotion)}" placeholder="내 말로 적어볼게요" />
+          </div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="emotion-next" ${(state.emotions.length || state.customEmotion.trim()) ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '이 마음의 크기도 볼게요'}</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        bindMultiChips('emotions', 'emotion-next');
+        const input = document.getElementById('custom-emotion');
+        input.addEventListener('input', () => {
+          state.customEmotion = input.value;
+          document.getElementById('emotion-next').disabled = state.emotions.length === 0 && !state.customEmotion.trim();
+        });
+        document.getElementById('emotion-next').addEventListener('click', goNext);
+        bindSafetyButtons();
+      }
+
+      function renderIntensity() {
+        content.innerHTML = `
+          <h1 class="question" tabindex="-1">그 감정은 지금 얼마나 크게 남아 있나요?</h1>
+          <p class="lead">그때가 아니라, 지금 이 화면을 보고 있는 순간을 기준으로 골라주세요.</p>
+          <div class="range-block">
+            <div class="range-reading"><span class="range-value" id="range-reading">${state.intensity}</span><span class="range-unit">10점 중</span></div>
+            <label class="visually-hidden" for="intensity-range">현재 감정 강도</label>
+            <input id="intensity-range" type="range" min="0" max="10" step="1" value="${state.intensity}" />
+            <div class="range-ends"><span>거의 가라앉았어요</span><span>아주 크게 남아 있어요</span></div>
+          </div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="intensity-next">이 정도예요</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        const range = document.getElementById('intensity-range');
+        updateRangeVisual(range);
+        range.addEventListener('input', () => {
+          state.intensity = Number(range.value);
+          document.getElementById('range-reading').textContent = range.value;
+          updateRangeVisual(range);
+        });
+        document.getElementById('intensity-next').addEventListener('click', goNext);
+        bindSafetyButtons();
+      }
+
+      function renderPause() {
+        content.innerHTML = `
+          <h1 class="question compact" tabindex="-1">지금은 이해보다 숨을 돌리는 게 먼저일 수 있어요.</h1>
+          <p class="lead">감정을 없애려는 시간이 아니에요. 몸이 이 자리에 있다는 것만 잠깐 확인해 볼까요?</p>
+          <div class="pause-panel">
+            <p class="pause-prompt" id="pause-prompt">발바닥이 바닥에 닿는 감각을 느껴보세요.</p>
+            <p class="pause-instruction" id="pause-instruction">어깨에 들어간 힘을 조금 풀고, 평소보다 천천히 숨을 내쉬어도 좋아요.</p>
+            <div class="pause-timer">
+              <div class="timer-line" id="timer-line" aria-hidden="true"><span></span></div>
+              <span class="timer-number" id="timer-number">20초</span>
+            </div>
+          </div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="pause-start">${state.pauseCompleted ? '조금 쉬었어요' : '20초만 멈춰볼게요'}</button>
+            <button class="secondary-button" type="button" id="pause-skip">지금은 괜찮아요, 이어갈게요</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        let timerId = null;
+        let remaining = 20;
+        const start = document.getElementById('pause-start');
+        const skip = document.getElementById('pause-skip');
+        if (state.pauseCompleted) start.addEventListener('click', goNext);
+        else start.addEventListener('click', () => {
+          start.disabled = true;
+          skip.disabled = true;
+          document.getElementById('timer-line').classList.add('running');
+          timerId = window.setInterval(() => {
+            remaining -= 1;
+            document.getElementById('timer-number').textContent = remaining > 0 ? `${remaining}초` : '됐어요';
+            if (remaining <= 0) {
+              window.clearInterval(timerId);
+              state.pauseCompleted = true;
+              document.getElementById('pause-prompt').textContent = '지금 마음이 그대로여도 괜찮아요.';
+              document.getElementById('pause-instruction').textContent = '조금 더 살펴볼 수 있을 때 다음으로 이어가요.';
+              start.disabled = false;
+              start.textContent = '이제 이어갈게요';
+              start.addEventListener('click', goNext, { once: true });
+              skip.disabled = false;
+            }
+          }, 1000);
+        }, { once: true });
+        skip.addEventListener('click', () => {
+          if (timerId) window.clearInterval(timerId);
+          goNext();
+        });
+        bindSafetyButtons();
+      }
+
+      function renderMeaning() {
+        content.innerHTML = `
+          <h1 class="question" tabindex="-1">그 순간, 나에게는 어떤 뜻으로 느껴졌나요?</h1>
+          <p class="lead">상대의 실제 의도를 맞히는 질문은 아니에요. 그 일이 내 마음에 어떻게 닿았는지 적어주세요.</p>
+          <div class="field">
+            <label class="field-label" for="meaning-input">내가 받아들인 의미</label>
+            <textarea id="meaning-input" maxlength="600" placeholder="예: 내 마음이 중요하지 않은 것처럼 느껴졌어요">${escapeHtml(state.meaning)}</textarea>
+            <span class="field-helper">“상대는 분명히…”보다 “나에게는 …처럼 느껴졌다”로 시작하면 구분하기 쉬워요.</span>
+          </div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="meaning-next" ${state.meaning.trim() ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '그 안의 중요한 마음을 볼게요'}</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        const input = document.getElementById('meaning-input');
+        input.addEventListener('input', () => {
+          state.meaning = input.value;
+          document.getElementById('meaning-next').disabled = !state.meaning.trim();
+        });
+        document.getElementById('meaning-next').addEventListener('click', goNext);
+        bindSafetyButtons();
+      }
+
+      function renderNeed() {
+        content.innerHTML = `
+          <h1 class="question compact" tabindex="-1">그 마음 안에서, 내가 지키고 싶었던 것은 무엇이었을까요?</h1>
+          <p class="lead">감정이 컸다는 건 나에게 중요했던 것이 있었다는 뜻일 수 있어요. 가까운 것을 골라주세요.</p>
+          <div class="chip-grid" aria-label="중요했던 마음 선택">${chipMarkup(needs, state.needs)}</div>
+          <div class="field">
+            <label class="field-label" for="custom-need">내 말로 적고 싶다면</label>
+            <input class="text-input" id="custom-need" maxlength="80" value="${escapeHtml(state.customNeed)}" placeholder="나에게 중요했던 것" />
+          </div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="need-next" ${(state.needs.length || state.customNeed.trim()) ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '내 마음을 한 번 정리해 볼게요'}</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        bindMultiChips('needs', 'need-next');
+        const input = document.getElementById('custom-need');
+        input.addEventListener('input', () => {
+          state.customNeed = input.value;
+          document.getElementById('need-next').disabled = state.needs.length === 0 && !state.customNeed.trim();
+        });
+        document.getElementById('need-next').addEventListener('click', goNext);
+        bindSafetyButtons();
+      }
+
+      function renderMap() {
+        const emotionText = [...state.emotions, state.customEmotion.trim()].filter(Boolean).join(', ');
+        const needText = [...state.needs, state.customNeed.trim()].filter(Boolean).join(', ');
+        const rows = [
+          { label: '있었던 일', value: state.story, target: 'story' },
+          { label: '남은 장면', value: state.moment, target: 'moment' },
+          { label: '느낀 마음', value: emotionText, target: 'emotion' },
+          { label: '받아들인 뜻', value: state.meaning, target: 'meaning' },
+          { label: '중요했던 것', value: needText, target: 'need' }
+        ];
+        content.innerHTML = `
+          <h1 class="question compact" tabindex="-1">당신이 적어준 말을 한자리에 놓아봤어요.</h1>
+          <p class="lead">내 마음과 다르게 정리된 부분이 있다면 직접 고쳐주세요. 이 내용이 정답은 아니에요.</p>
+          <div class="mind-map">${rows.map(row => `
+            <div class="map-row">
+              <span class="map-label">${row.label}</span>
+              <p class="map-value">${escapeHtml(row.value)}</p>
+              <button class="edit-button" type="button" data-edit="${row.target}" aria-label="${row.label} 수정">수정</button>
+            </div>`).join('')}</div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="map-next">이 정도면 내 마음과 가까워요</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        content.querySelectorAll('[data-edit]').forEach(button => button.addEventListener('click', () => jumpTo(button.dataset.edit, true)));
+        document.getElementById('map-next').addEventListener('click', goNext);
+        bindSafetyButtons();
+      }
+
+      function renderNext() {
+        content.innerHTML = `
+          <h1 class="question" tabindex="-1">지금의 나에게 가장 맞는 다음은 무엇인가요?</h1>
+          <p class="lead">해결에 가까운 선택이 아니어도 괜찮아요. 지금 할 수 있는 만큼만 골라주세요.</p>
+          <div class="choice-list">${choiceMarkup(nextOptions, state.nextChoice)}</div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="next-choice-button" ${state.nextChoice ? '' : 'disabled'}>이 선택을 가져갈게요</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        bindSingleChoice('nextChoice', 'next-choice-button');
+        document.getElementById('next-choice-button').addEventListener('click', goNext);
+        bindSafetyButtons();
+      }
+
+      function renderClarityAfter() {
+        content.innerHTML = `
+          <h1 class="question" tabindex="-1">지금은 내 마음이 얼마나 보이는 것 같나요?</h1>
+          <p class="lead">처음에는 ${state.clarityBefore}점이라고 골랐어요. 더 선명해지지 않았어도 있는 그대로 알려주세요.</p>
+          <div class="range-block">
+            <div class="range-reading"><span class="range-value" id="range-reading">${state.clarityAfter}</span><span class="range-unit">10점 중</span></div>
+            <label class="visually-hidden" for="clarity-after-range">세션 후 마음 명료도</label>
+            <input id="clarity-after-range" type="range" min="0" max="10" step="1" value="${state.clarityAfter}" />
+            <div class="range-ends"><span>여전히 잘 모르겠어요</span><span>전보다 선명해요</span></div>
+          </div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="clarity-after-next">이 정도예요</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        const range = document.getElementById('clarity-after-range');
+        updateRangeVisual(range);
+        range.addEventListener('input', () => {
+          state.clarityAfter = Number(range.value);
+          document.getElementById('range-reading').textContent = range.value;
+          updateRangeVisual(range);
+        });
+        document.getElementById('clarity-after-next').addEventListener('click', goNext);
+        bindSafetyButtons();
+      }
+
+      function scaleMarkup(name, selected) {
+        return `<div class="scale-options">${[1, 2, 3, 4, 5].map(value => `
+          <label class="scale-option"><input type="radio" name="${name}" value="${value}" ${Number(selected) === value ? 'checked' : ''} /><span>${value}</span></label>`).join('')}</div>
+          <div class="scale-labels"><span>전혀 아니에요</span><span>매우 그래요</span></div>`;
+      }
+
+      function renderFeedback() {
+        content.innerHTML = `
+          <h1 class="question" tabindex="-1">이 시간은 어떻게 느껴졌나요?</h1>
+          <p class="lead">좋게 평가하지 않아도 괜찮아요. 솔직한 느낌이 다음 버전을 만드는 데 더 도움이 돼요.</p>
+          <div class="feedback-grid">
+            <fieldset class="feedback-item"><legend>내 말을 내 마음과 가깝게 정리해 줬나요?</legend>${scaleMarkup('understood', state.feedback.understood)}</fieldset>
+            <fieldset class="feedback-item"><legend>내가 말하지 않은 것을 멋대로 해석한다고 느꼈나요?</legend>${scaleMarkup('inferred', state.feedback.inferred)}</fieldset>
+            <fieldset class="feedback-item"><legend>마지막 선택이 내 몫으로 남아 있었나요?</legend>${scaleMarkup('agency', state.feedback.agency)}</fieldset>
+          </div>
+          <div class="field">
+            <label class="field-label" for="comment-input">한 줄 의견 <span style="font-weight:400;color:var(--muted)">(선택)</span></label>
+            <textarea id="comment-input" maxlength="500" placeholder="어색했던 질문이나 빠졌으면 하는 단계가 있었나요?">${escapeHtml(state.comment)}</textarea>
+          </div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="feedback-next" ${feedbackComplete() ? '' : 'disabled'}>테스트를 마칠게요</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+          </div>`;
+        content.querySelectorAll('input[type="radio"]').forEach(input => input.addEventListener('change', () => {
+          state.feedback[input.name] = Number(input.value);
+          document.getElementById('feedback-next').disabled = !feedbackComplete();
+        }));
+        document.getElementById('comment-input').addEventListener('input', event => { state.comment = event.target.value; });
+        document.getElementById('feedback-next').addEventListener('click', goNext);
+        bindSafetyButtons();
+      }
+
+      function feedbackComplete() {
+        return state.feedback.understood > 0 && state.feedback.inferred > 0 && state.feedback.agency > 0;
+      }
+
+      function renderDone() {
+        const emotionText = [...state.emotions, state.customEmotion.trim()].filter(Boolean).join(', ');
+        const needText = [...state.needs, state.customNeed.trim()].filter(Boolean).join(', ');
+        content.innerHTML = `
+          <h1 class="question" tabindex="-1">마음을 다 정리하지 못해도 괜찮아요.</h1>
+          <p class="lead">오늘은 내 마음을 서둘러 결론 내리지 않고 여기까지 바라봤어요.</p>
+          <dl class="result-sheet">
+            <div class="result-line"><dt>오늘 알아차린 마음</dt><dd>${escapeHtml(emotionText)}${needText ? `<br />그 안에서 ${escapeHtml(needText)}이 중요했어요.` : ''}</dd></div>
+            <div class="result-line"><dt>지금 내가 고른 다음</dt><dd>${escapeHtml(state.nextChoice)}</dd></div>
+            <div class="result-line"><dt>마음의 선명함</dt><dd>${state.clarityBefore}점에서 ${state.clarityAfter}점</dd></div>
+          </dl>
+          <div class="privacy-note">${lockIcon}<span>아래 복사 내용에는 개인적인 상황과 직접 적은 문장을 넣지 않아요. 평가 점수와 한 줄 의견만 복사됩니다.</span></div>
+          <div class="action-zone">
+            <button class="primary-button" type="button" id="copy-result">테스트 결과 복사하기</button>
+            <button class="secondary-button" type="button" id="restart-session">처음부터 다시 보기</button>
+          </div>
+          <p class="status-message" id="copy-status" aria-live="polite"></p>`;
+        document.getElementById('copy-result').addEventListener('click', copyTestResult);
+        document.getElementById('restart-session').addEventListener('click', restartSession);
+      }
+
+      function testResultText() {
+        const minutes = Math.max(1, Math.round((Date.now() - state.startedAt) / 60000));
+        return [
+          'Re:Mind 마음 정리 세션 · 초기 테스트 결과',
+          '',
+          `세션 목표: ${state.goal}`,
+          `마음의 명료도: ${state.clarityBefore} → ${state.clarityAfter}`,
+          `내 말을 가깝게 정리함: ${state.feedback.understood}/5`,
+          `과하게 해석한다고 느낌: ${state.feedback.inferred}/5`,
+          `선택권이 남아 있었음: ${state.feedback.agency}/5`,
+          `내가 고른 다음: ${state.nextChoice}`,
+          `소요 시간: 약 ${minutes}분`,
+          state.comment.trim() ? `한 줄 의견: ${state.comment.trim()}` : '한 줄 의견: 없음',
+          '',
+          '※ 개인적인 상황 원문과 감정 서술은 포함하지 않았습니다.'
+        ].join('\n');
+      }
+
+      async function copyTestResult() {
+        const status = document.getElementById('copy-status');
+        try {
+          await navigator.clipboard.writeText(testResultText());
+          status.textContent = '복사했어요. 테스트를 부탁한 사람에게 그대로 보내주세요.';
+        } catch (error) {
+          const textarea = document.createElement('textarea');
+          textarea.value = testResultText();
+          textarea.setAttribute('readonly', '');
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          textarea.remove();
+          status.textContent = '복사했어요. 테스트를 부탁한 사람에게 그대로 보내주세요.';
+        }
+      }
+
+      function restartSession() {
+        Object.assign(state, {
+          step: 0,
+          startedAt: Date.now(),
+          goal: '',
+          clarityBefore: 4,
+          story: '',
+          moment: '',
+          emotions: [],
+          customEmotion: '',
+          intensity: 5,
+          meaning: '',
+          needs: [],
+          customNeed: '',
+          nextChoice: '',
+          clarityAfter: 5,
+          feedback: { understood: 0, inferred: 0, agency: 0 },
+          comment: '',
+          riskChecked: false,
+          pauseCompleted: false,
+          returnToMap: false
+        });
+        history.replaceState({ step: 0 }, '', '#welcome');
+        render();
+      }
+
+      function bindSafetyButtons() {
+        document.querySelectorAll('[data-open-safety]').forEach(button => {
+          if (button.dataset.bound === 'true') return;
+          button.dataset.bound = 'true';
+          button.addEventListener('click', () => safetyDialog.showModal());
+        });
+      }
+
+      document.querySelectorAll('[data-close-safety]').forEach(button => button.addEventListener('click', () => safetyDialog.close()));
+
+      document.getElementById('risk-yes').addEventListener('click', () => {
+        state.riskChecked = true;
+        riskDialog.close();
+        safetyDialog.showModal();
+      });
+
+      document.getElementById('risk-no').addEventListener('click', () => {
+        state.riskChecked = true;
+        riskDialog.close();
+        goNext();
+      });
+
+      window.addEventListener('popstate', event => {
+        if (event.state && Number.isInteger(event.state.step)) {
+          state.step = event.state.step;
+          state.returnToMap = false;
+          render(false);
+        }
+      });
+
+      render(false);
+    })();
+  </script>
+</body>
+</html>
