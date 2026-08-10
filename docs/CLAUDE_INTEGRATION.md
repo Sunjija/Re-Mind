@@ -5,7 +5,7 @@
 - 프런트엔드의 AI 선택, 외부 전송 동의, 로딩, 오류 시 기본 질문 전환이 구현되어 있다.
 - Cloudflare Worker의 `/v1/reflection/next`, `/v1/reflection/map`, `/health`가 구현되어 있다.
 - Worker 계약 테스트와 로컬 모의 API를 이용한 모바일 흐름 검증이 완료되었다.
-- 공개 Worker 주소와 Secret은 아직 설정하지 않았다. 따라서 GitHub Pages에서는 기본 질문 모드만 활성화된다.
+- 공개 Worker 주소와 Secret이 설정되어 GitHub Pages에서 AI 질문 모드와 기본 질문 모드를 모두 사용할 수 있다.
 
 ## 구조
 

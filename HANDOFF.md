@@ -5,7 +5,7 @@
 - 모바일 우선 상담형 마음 정리 세션과 선택형 Claude 질문 흐름이 구현되어 있다.
 - GitHub Pages 공개 경로는 `https://sunjija.github.io/Re-Mind/counseling-test/`이다.
 - 기본 질문 모드는 서버·API·계정 없이 동작한다. AI 모드는 Cloudflare Worker 배포와 Secret 설정이 필요하다.
-- 현재 `outputs/counseling-test/config.js`의 Worker 주소가 비어 있어 공개 페이지의 AI 선택지는 안전하게 비활성화된 상태다.
+- Cloudflare Worker가 `https://re-mind-reflection-api.remind-sunjija.workers.dev`에 배포되어 공개 페이지의 AI 선택지가 활성화되어 있다.
 - 이 프로토타입의 목적은 상담 효과를 주장하는 것이 아니라, 질문 구조·말투·완료율·사용자 통제감을 검증하는 것이다.
 
 ## 가장 먼저 읽을 파일

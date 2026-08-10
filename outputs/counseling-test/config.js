@@ -1,3 +1,3 @@
 window.REMIND_CONFIG = Object.freeze({
-  aiApiBase: ''
+  aiApiBase: 'https://re-mind-reflection-api.remind-sunjija.workers.dev'
 });
