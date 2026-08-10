@@ -17,6 +17,7 @@
 5. `outputs/remind_counseling_psychology_validation_v0.1.md` — 상담심리 근거 조사
 6. `docs/WORKLOG_2026-08-10.md` — 이번 구현과 QA 기록
 7. `docs/CLAUDE_INTEGRATION.md` — 비밀키를 노출하지 않는 동적 질문 연동·배포 안내
+8. `docs/AI_QUESTION_POLICY.md` — 82개 근거를 압축한 질문 모듈·생성 제한·서버 검증 규칙
 
 ## 세션 흐름
 
@@ -42,12 +43,14 @@
 - 프런트엔드: HTML, CSS, JavaScript가 `outputs/counseling-test/index.html`에 함께 있다.
 - 설정: `outputs/counseling-test/config.js`가 공개 Worker 주소만 제공하며 비밀값은 포함하지 않는다.
 - AI 프록시: `worker/src/index.js`가 Origin·동의·입력 크기·안전 신호를 확인하고 Anthropic의 구조화 응답을 검증한다.
+- 질문 정책: `worker/src/reflection-policy.js`가 단계별 허용 모듈과 근거 기반 경계를 매 Claude 호출의 시스템 지침에 제공한다.
 - 상태: `state` 객체에 현재 단계와 답변이 저장되며 새로고침 시 초기화된다.
 - 렌더링: 단계별 `render*` 함수가 화면을 만들고 `goNext`, `goBack`이 이동을 담당한다.
 - 뒤로가기: `history.pushState`와 `popstate`로 브라우저 뒤로가기를 지원한다.
 - 반응형: 960px 미만은 단일 열, 960px 이상은 300px 맥락 레일과 종이 작업대다.
 - 접근성: 실제 label, button, radio, range, dialog 요소와 focus-visible, reduced-motion 대응을 사용한다.
 - 장애 대응: 13초 타임아웃, API 오류, 잘못된 구조화 응답은 모두 현재 정적 질문으로 되돌린다.
+- 모바일 카피: AI 질문 38자, 설명 72자, 필드명 24자, 예시 56자를 Worker와 CSS 양쪽에서 보호한다.
 
 ## 제품 경계
 

@@ -30,16 +30,18 @@ const server = http.createServer(async (request, response) => {
       prompt: isStoryPhase
         ? {
             route: 'ask_moment',
-            question: '약속이 바뀌었다는 말을 들었을 때, 가장 먼저 마음에 걸린 장면은 무엇이었나요?',
-            lead: '사건 전체를 설명하기보다 마음이 멈춰 선 순간 하나만 떠올려봐요.',
+            moduleId: 'concrete_moment',
+            question: '어떤 순간이 가장 오래 남았나요?',
+            lead: '마음이 멈춰 선 장면 하나만 떠올려봐요.',
             label: '마음이 멈춰 선 순간',
             placeholder: '예: 이유를 듣기 전에 통보받았다고 느낀 순간',
             extractedMoment: ''
           }
         : {
             route: 'ask_meaning',
-            question: '그 서운함은 내 마음이 어떤 대우를 받았다는 느낌과 가까웠나요?',
-            lead: '상대의 의도가 아니라 그 순간 내 안에 남은 뜻을 살펴봐요.',
+            moduleId: 'felt_meaning',
+            question: '그 서운함은 어떤 뜻으로 남았나요?',
+            lead: '상대의 의도가 아니라 내게 남은 뜻을 살펴봐요.',
             label: '내게 남은 뜻',
             placeholder: '예: 내 시간은 중요하게 여겨지지 않는 느낌이었어요',
             extractedMoment: ''

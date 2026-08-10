@@ -6,6 +6,7 @@
 - Cloudflare Worker의 `/v1/reflection/next`, `/v1/reflection/map`, `/health`가 구현되어 있다.
 - Worker 계약 테스트와 로컬 모의 API를 이용한 모바일 흐름 검증이 완료되었다.
 - 공개 Worker 주소와 Secret이 설정되어 GitHub Pages에서 AI 질문 모드와 기본 질문 모드를 모두 사용할 수 있다.
+- 질문 생성에는 `evidence-v0.2` 정책과 단계별 허용 모듈이 항상 시스템 지침으로 포함된다.
 
 ## 구조
 
@@ -41,6 +42,8 @@ Claude는 진단, 잘잘못 판정, 상대 의도 추측, 화해·이별 권유,
 - `outputs/counseling-test/index.html`: AI/기본 질문 선택, 동의, API 호출, 실패 시 정적 폴백
 - `outputs/counseling-test/config.js`: 공개 Worker 주소만 설정
 - `worker/src/index.js`: CORS, 검증, Anthropic 호출, 구조화 출력 검증
+- `worker/src/reflection-policy.js`: 82개 근거를 압축한 실행 정책과 단계별 질문 모듈
+- `docs/AI_QUESTION_POLICY.md`: 사람이 검토할 수 있는 질문 정책 문서
 - `worker/wrangler.jsonc`: Worker 이름, 모델, Origin 설정
 - `worker/tests/worker.test.mjs`: Worker 계약 테스트
 - `worker/tests/mock-server.mjs`: 실제 키 없이 모바일 UI 흐름을 확인하는 로컬 API
@@ -104,5 +107,6 @@ node worker/tests/mock-server.mjs
 - 브라우저 요청 제한: 13초. 실패해도 입력은 유지되고 기본 질문으로 진행한다.
 - Worker의 Anthropic 요청 제한: 15초.
 - 429, 타임아웃, 잘못된 JSON, 잘못된 구절 추출은 사용자에게 내부 오류를 노출하지 않고 폴백한다.
+- 질문이 38자, 설명이 72자를 넘거나 현재 단계에서 허용되지 않은 모듈이면 짧은 기본 질문으로 폴백한다.
 - 위험 키워드는 브라우저와 Worker 양쪽에서 확인한다. Worker는 안전 신호가 있으면 Anthropic API를 호출하지 않는다.
 - 위험 확인은 임상적 평가가 아니며 112·119·129 안내와 항상 함께 제공한다.
