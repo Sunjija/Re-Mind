@@ -25,6 +25,7 @@ const server = http.createServer(async (request, response) => {
 
   if (request.method === 'POST' && request.url === '/v1/reflection/next') {
     const isStoryPhase = body.phase === 'after_story';
+    const isDeepPhase = body.phase === 'after_need';
     response.end(JSON.stringify({
       mode: 'ai',
       prompt: isStoryPhase
@@ -37,7 +38,17 @@ const server = http.createServer(async (request, response) => {
             placeholder: '예: 이유를 듣기 전에 통보받았다고 느낀 순간',
             extractedMoment: ''
           }
-        : {
+        : isDeepPhase
+          ? {
+              route: 'ask_deeper',
+              moduleId: 'unspoken_message',
+              question: '그 순간 차마 하지 못한 말이 있나요?',
+              lead: '상대에게 보낼 문장이 아니에요. 내 안의 말만 적어봐요.',
+              label: '하지 못한 말',
+              placeholder: '예: 내 상황도 먼저 물어봐 주길 바랐어',
+              extractedMoment: ''
+            }
+          : {
             route: 'ask_meaning',
             moduleId: 'felt_meaning',
             question: '그 서운함은 어떤 뜻으로 남았나요?',
@@ -46,6 +57,19 @@ const server = http.createServer(async (request, response) => {
             placeholder: '예: 내 시간은 중요하게 여겨지지 않는 느낌이었어요',
             extractedMoment: ''
           }
+    }));
+    return;
+  }
+
+  if (request.method === 'POST' && request.url === '/v1/reflection/understanding') {
+    const answers = body.answers || {};
+    response.end(JSON.stringify({
+      mode: 'ai',
+      reflection: {
+        moment: answers.moment || '',
+        meaning: answers.understandingCorrection || answers.meaning || '',
+        emotion: answers.emotions?.[0] || '잘 모르겠음'
+      }
     }));
     return;
   }
@@ -59,7 +83,8 @@ const server = http.createServer(async (request, response) => {
         moment: answers.moment || '',
         emotions: answers.emotions || [],
         meaning: answers.meaning || '',
-        needs: answers.needs || []
+        needs: answers.needs || [],
+        deeper: answers.deepAnswer || ''
       }
     }));
     return;

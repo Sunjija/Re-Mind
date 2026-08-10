@@ -1,4 +1,4 @@
-export const POLICY_VERSION = 'evidence-v0.2';
+export const POLICY_VERSION = 'evidence-v0.3';
 
 export const QUESTION_MODULES = Object.freeze({
   after_story: Object.freeze([
@@ -39,6 +39,23 @@ export const QUESTION_MODULES = Object.freeze({
       useWhen: '사용자가 의미를 확정하기 어렵거나 혼란스럽다고 표현한다.',
       action: '정답을 요구하지 않고 가장 가까운 느낌을 묻는다.'
     })
+  ]),
+  after_need: Object.freeze([
+    Object.freeze({
+      id: 'unspoken_message',
+      useWhen: '중요했던 마음은 드러났지만 사용자가 하지 못한 말은 아직 남아 있다.',
+      action: '그 순간 차마 하지 못한 말 하나를 묻는다.'
+    }),
+    Object.freeze({
+      id: 'desired_change',
+      useWhen: '사용자가 다음 행동보다 달라지길 바라는 경험을 먼저 분명히 할 필요가 있다.',
+      action: '지금 가장 달라졌으면 하는 점 하나를 묻는다.'
+    }),
+    Object.freeze({
+      id: 'self_response',
+      useWhen: '사건과 감정은 드러났지만 사용자가 그때 어떻게 반응했는지 빠져 있다.',
+      action: '그 순간 자신이 보인 반응 하나를 묻는다.'
+    })
   ])
 });
 
@@ -73,6 +90,8 @@ export const REFLECTION_POLICY = `Re:Mind 질문 정책 ${POLICY_VERSION}
 [안전과 자율성]
 - 자해·타해·폭력·협박·강압적 통제는 모델이 해결하거나 평가하지 않는다. 서버의 안전 분기를 따른다.
 - 사용자가 잘 모르겠다고 답할 수 있게 하고, 감정이나 의미를 확정하지 않는다.
+- 모델이 고른 이해는 반드시 사용자가 맞음·수정·모르겠음 중 하나로 확인할 수 있게 한다.
+- 심화 질문은 사용자가 원할 때 한 개만 추가하고, 정리를 선택하면 즉시 멈춘다.
 - 대화를 오래 이어가는 것을 목표로 하지 않는다.`;
 
 export function moduleCatalogFor(phase) {
@@ -83,5 +102,7 @@ export function moduleAllowed(phase, moduleId, route) {
   if (phase === 'after_story' && route === 'use_story_moment') return moduleId === 'use_existing_moment';
   if (phase === 'after_story') return ['concrete_moment', 'observable_event', 'first_impact'].includes(moduleId);
   if (phase === 'after_intensity') return ['felt_meaning', 'fact_vs_interpretation', 'uncertainty'].includes(moduleId);
+  if (phase === 'after_need') return route === 'ask_deeper'
+    && ['unspoken_message', 'desired_change', 'self_response'].includes(moduleId);
   return false;
 }

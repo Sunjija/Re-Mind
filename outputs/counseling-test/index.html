@@ -378,6 +378,45 @@
       color: var(--muted);
     }
 
+    .understanding-sheet {
+      margin-top: 28px;
+      border-top: 1px solid var(--green);
+      border-bottom: 1px solid var(--green);
+    }
+
+    .understanding-line {
+      display: grid;
+      gap: 7px;
+      padding: 17px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .understanding-line:last-child { border-bottom: 0; }
+
+    .understanding-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .understanding-value {
+      margin: 0;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .understanding-question {
+      margin: 25px 0 0;
+      color: var(--ink);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
     .choice-list {
       display: grid;
       gap: 10px;
@@ -1264,6 +1303,16 @@
         aiMomentStatus: '',
         aiMeaningPrompt: null,
         aiMeaningStatus: '',
+        aiUnderstanding: null,
+        aiUnderstandingStatus: '',
+        understandingVerdict: '',
+        understandingCorrection: '',
+        understandingRevision: 0,
+        depthChoice: '',
+        aiSkipDeep: false,
+        aiDeepPrompt: null,
+        aiDeepStatus: '',
+        deepAnswer: '',
         aiMap: null,
         aiMapStatus: ''
       };
@@ -1278,7 +1327,10 @@
         { id: 'intensity', stage: 2, render: renderIntensity },
         { id: 'pause', stage: 2, render: renderPause, conditional: () => state.intensity >= 8 },
         { id: 'meaning', stage: 2, render: renderMeaning },
+        { id: 'understanding', stage: 2, render: renderUnderstanding },
         { id: 'need', stage: 2, render: renderNeed },
+        { id: 'depth-choice', stage: 2, render: renderDepthChoice },
+        { id: 'deep', stage: 2, render: renderDeep, conditional: () => !state.aiSkipDeep },
         { id: 'map', stage: 3, render: renderMap },
         { id: 'next', stage: 3, render: renderNext },
         { id: 'clarity-after', stage: 4, render: renderClarityAfter },
@@ -1301,6 +1353,12 @@
           .replaceAll('>', '&gt;')
           .replaceAll('"', '&quot;')
           .replaceAll("'", '&#039;');
+      }
+
+      function clipCopy(value, max) {
+        const normalized = String(value ?? '').trim().replace(/\s+/g, ' ');
+        const characters = Array.from(normalized);
+        return characters.length <= max ? normalized : `${characters.slice(0, max - 1).join('')}…`;
       }
 
       function resolveAiApiBase() {
@@ -1327,8 +1385,28 @@
           emotions: [...state.emotions, state.customEmotion.trim()].filter(Boolean),
           intensity: state.intensity,
           meaning: state.meaning,
-          needs: [...state.needs, state.customNeed.trim()].filter(Boolean)
+          needs: [...state.needs, state.customNeed.trim()].filter(Boolean),
+          understandingVerdict: state.understandingVerdict,
+          understandingCorrection: state.understandingCorrection,
+          deepAnswer: state.deepAnswer
         };
+      }
+
+      function resetDepthState() {
+        state.depthChoice = '';
+        state.aiSkipDeep = false;
+        state.aiDeepPrompt = null;
+        state.aiDeepStatus = '';
+        state.deepAnswer = '';
+      }
+
+      function resetUnderstandingState() {
+        state.aiUnderstanding = null;
+        state.aiUnderstandingStatus = '';
+        state.understandingVerdict = '';
+        state.understandingCorrection = '';
+        state.understandingRevision = 0;
+        resetDepthState();
       }
 
       async function callAi(path, payload) {
@@ -1357,12 +1435,12 @@
         }
       }
 
-      function setAiLoading(button, status, message) {
+      function setAiLoading(button, status, message, statusCopy = '작성한 답에 맞는 다음 질문 하나를 고르고 있어요.') {
         button.disabled = true;
         button.setAttribute('aria-busy', 'true');
         button.dataset.idleLabel = button.textContent;
         button.textContent = message;
-        if (status) status.textContent = '작성한 답에 맞는 다음 질문 하나를 고르고 있어요.';
+        if (status) status.textContent = statusCopy;
       }
 
       function clearAiLoading(button, status) {
@@ -1386,9 +1464,12 @@
             state.aiMomentStatus = 'ai';
             state.aiSkipMoment = response.prompt?.route === 'use_story_moment';
             if (state.aiSkipMoment) state.moment = response.prompt.extractedMoment;
-          } else {
+          } else if (phase === 'after_intensity') {
             state.aiMeaningPrompt = response.prompt;
             state.aiMeaningStatus = 'ai';
+          } else {
+            state.aiDeepPrompt = response.prompt;
+            state.aiDeepStatus = 'ai';
           }
           return true;
         } catch (error) {
@@ -1401,10 +1482,48 @@
             state.aiSkipMoment = false;
             state.aiMomentPrompt = null;
             state.aiMomentStatus = 'fallback';
-          } else {
+          } else if (phase === 'after_intensity') {
             state.aiMeaningPrompt = null;
             state.aiMeaningStatus = 'fallback';
+          } else {
+            state.aiDeepPrompt = null;
+            state.aiDeepStatus = 'fallback';
           }
+          return true;
+        } finally {
+          clearAiLoading(button, status);
+        }
+      }
+
+      async function prepareAiUnderstanding(button, status) {
+        const fallback = {
+          moment: clipCopy(state.moment, 48),
+          meaning: clipCopy(state.understandingCorrection.trim() || state.meaning, 48),
+          emotion: clipCopy([...state.emotions, state.customEmotion.trim()].filter(Boolean)[0] || '잘 모르겠음', 24)
+        };
+        if (!aiModeActive()) {
+          state.aiUnderstanding = fallback;
+          state.aiUnderstandingStatus = 'fallback';
+          return true;
+        }
+        setAiLoading(button, status, '내 말을 다시 살펴보는 중…', '적어준 말 안에서 핵심 표현을 고르고 있어요.');
+        try {
+          const response = await callAi('/v1/reflection/understanding', { consent: true, answers: aiAnswers() });
+          state.aiUnderstanding = {
+            moment: clipCopy(response.reflection?.moment || fallback.moment, 48),
+            meaning: clipCopy(response.reflection?.meaning || fallback.meaning, 48),
+            emotion: clipCopy(response.reflection?.emotion || fallback.emotion, 24)
+          };
+          state.aiUnderstandingStatus = 'ai';
+          return true;
+        } catch (error) {
+          if (error.code === 'SAFETY_CHECK_REQUIRED') {
+            state.riskChecked = false;
+            riskDialog.showModal();
+            return false;
+          }
+          state.aiUnderstanding = fallback;
+          state.aiUnderstandingStatus = 'fallback';
           return true;
         } finally {
           clearAiLoading(button, status);
@@ -1454,9 +1573,10 @@
         const position = Math.max(0, active.indexOf(state.step));
         const meaningfulTotal = active.length - 2;
         const meaningfulPosition = Math.max(0, Math.min(meaningfulTotal, position));
+        const currentStage = screens[state.step].stage;
         return {
           percent: meaningfulTotal ? Math.round((meaningfulPosition / meaningfulTotal) * 100) : 0,
-          label: state.step === 0 ? '마음 정리 시작' : `${meaningfulPosition} / ${meaningfulTotal}`
+          label: state.step === 0 ? '마음 정리 시작' : `${stageLabels[currentStage]} · ${meaningfulPosition}단계`
         };
       }
 
@@ -1543,7 +1663,7 @@
           const item = typeof option === 'string' ? { value: option, detail: '' } : option;
           const isSelected = selection.includes(item.value);
           return `<button class="choice" type="button" data-choice="${escapeHtml(item.value)}" aria-pressed="${isSelected}">
-            <span class="choice-copy"><span class="choice-title">${escapeHtml(item.value)}</span>${item.detail ? `<span class="choice-detail">${escapeHtml(item.detail)}</span>` : ''}</span>
+            <span class="choice-copy"><span class="choice-title">${escapeHtml(item.label || item.value)}</span>${item.detail ? `<span class="choice-detail">${escapeHtml(item.detail)}</span>` : ''}</span>
             <span class="choice-mark" aria-hidden="true">${checkIcon}</span>
           </button>`;
         }).join('');
@@ -1577,6 +1697,10 @@
             if (key === 'emotions') {
               state.aiMeaningPrompt = null;
               state.aiMeaningStatus = '';
+              resetUnderstandingState();
+            }
+            if (key === 'needs') {
+              resetDepthState();
             }
             button.setAttribute('aria-pressed', String(nextSelected.includes(value)));
             document.getElementById(buttonId).disabled = nextSelected.length === 0 && !state[key === 'emotions' ? 'customEmotion' : 'customNeed'].trim();
@@ -1718,6 +1842,7 @@
           state.aiMomentStatus = '';
           state.aiMeaningPrompt = null;
           state.aiMeaningStatus = '';
+          resetUnderstandingState();
           state.aiMap = null;
           state.aiMapStatus = '';
           document.getElementById('story-next').disabled = !state.story.trim();
@@ -1757,6 +1882,7 @@
           state.moment = input.value;
           state.aiMeaningPrompt = null;
           state.aiMeaningStatus = '';
+          resetUnderstandingState();
           state.aiMap = null;
           state.aiMapStatus = '';
           document.getElementById('moment-next').disabled = !state.moment.trim();
@@ -1787,6 +1913,7 @@
           state.customEmotion = input.value;
           state.aiMeaningPrompt = null;
           state.aiMeaningStatus = '';
+          resetUnderstandingState();
           state.aiMap = null;
           state.aiMapStatus = '';
           document.getElementById('emotion-next').disabled = state.emotions.length === 0 && !state.customEmotion.trim();
@@ -1816,6 +1943,7 @@
           state.intensity = Number(range.value);
           state.aiMeaningPrompt = null;
           state.aiMeaningStatus = '';
+          resetUnderstandingState();
           state.aiMap = null;
           state.aiMapStatus = '';
           document.getElementById('range-reading').textContent = range.value;
@@ -1902,18 +2030,99 @@
             <span class="field-helper">“상대는 분명히…”보다 “나에게는 …처럼 느껴졌다”로 시작하면 구분하기 쉬워요.</span>
           </div>
           <div class="action-zone sticky-mobile">
-            <button class="primary-button" type="button" id="meaning-next" ${state.meaning.trim() ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '그 안의 중요한 마음을 볼게요'}</button>
+            <button class="primary-button" type="button" id="meaning-next" ${state.meaning.trim() ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '내가 이해된 방향을 확인할게요'}</button>
             <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
           </div>`;
         const input = document.getElementById('meaning-input');
         input.addEventListener('input', () => {
           state.meaning = input.value;
+          state.aiUnderstanding = null;
+          state.aiUnderstandingStatus = '';
+          state.understandingVerdict = '';
+          state.understandingCorrection = '';
+          state.understandingRevision = 0;
+          resetDepthState();
           state.aiMap = null;
           state.aiMapStatus = '';
           document.getElementById('meaning-next').disabled = !state.meaning.trim();
         });
-        document.getElementById('meaning-next').addEventListener('click', () => {
-          if (!checkRiskBeforeContinue(state.meaning)) goNext();
+        document.getElementById('meaning-next').addEventListener('click', async event => {
+          if (checkRiskBeforeContinue(state.meaning)) return;
+          if (state.returnToMap) {
+            goNext();
+            return;
+          }
+          const ready = await prepareAiUnderstanding(event.currentTarget, null);
+          if (ready) goNext();
+        });
+        bindSafetyButtons();
+      }
+
+      function renderUnderstanding() {
+        const reflection = state.aiUnderstanding || {
+          moment: clipCopy(state.moment, 48),
+          meaning: clipCopy(state.understandingCorrection.trim() || state.meaning, 48),
+          emotion: clipCopy([...state.emotions, state.customEmotion.trim()].filter(Boolean)[0] || '잘 모르겠음', 24)
+        };
+        const showCorrection = state.understandingVerdict === 'different';
+        content.innerHTML = `
+          <h1 class="question compact" tabindex="-1">제가 이해한 방향이 맞는지 확인할게요.</h1>
+          <p class="lead">AI가 정답을 내린 게 아니에요. 적어준 말에서 고른 표현이 내 마음과 가까운지만 봐주세요.</p>
+          ${aiContextMarkup(state.aiUnderstandingStatus, '새로운 의미를 덧붙이지 않고, 직접 적은 말과 고른 감정 안에서 핵심 표현만 가져왔어요.')}
+          <div class="understanding-sheet">
+            <div class="understanding-line"><span class="understanding-label">가장 남은 순간</span><p class="understanding-value">“${escapeHtml(reflection.moment)}”</p></div>
+            <div class="understanding-line"><span class="understanding-label">그때 나에게 닿은 뜻</span><p class="understanding-value">“${escapeHtml(reflection.meaning)}”</p></div>
+            <div class="understanding-line"><span class="understanding-label">가까운 감정</span><p class="understanding-value">${escapeHtml(reflection.emotion)}</p></div>
+          </div>
+          <p class="understanding-question">이 정리가 지금 내 마음과 가까운가요?</p>
+          <div class="choice-list">
+            ${choiceMarkup([
+              { value: 'close', detail: '이 방향으로 조금 더 이어가 볼게요.' },
+              { value: 'different', detail: '다른 부분을 내 말로 바로잡을게요.' },
+              { value: 'unsure', detail: '확정하지 않고 지금 표현 그대로 가져가요.' }
+            ].map(item => ({
+              value: item.value,
+              detail: item.detail,
+              label: item.value === 'close' ? '네, 가까워요' : item.value === 'different' ? '조금 달라요' : '아직 잘 모르겠어요'
+            })), state.understandingVerdict)}
+          </div>
+          ${showCorrection ? `<div class="field">
+            <label class="field-label" for="understanding-correction">어떤 부분이 다른가요?</label>
+            <textarea id="understanding-correction" maxlength="600" placeholder="예: 무시당했다기보다, 혼자 결정된 느낌이 더 서운했어요">${escapeHtml(state.understandingCorrection)}</textarea>
+            <span class="field-helper">다시 확인은 두 번까지만 해요. 내 표현이 가장 중요하니까요.</span>
+          </div>` : ''}
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="understanding-next" ${state.understandingVerdict && (!showCorrection || state.understandingCorrection.trim()) ? '' : 'disabled'}>${showCorrection ? (state.understandingRevision >= 2 ? '내 설명 그대로 이어갈게요' : '내 말로 다시 확인할게요') : '이 이해로 이어갈게요'}</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+            <p class="status-message" id="ai-status" aria-live="polite"></p>
+          </div>`;
+
+        content.querySelectorAll('[data-choice]').forEach(button => {
+          const value = button.dataset.choice;
+          button.addEventListener('click', () => {
+            state.understandingVerdict = value;
+            render();
+          });
+        });
+
+        const correction = document.getElementById('understanding-correction');
+        if (correction) correction.addEventListener('input', () => {
+          state.understandingCorrection = correction.value;
+          document.getElementById('understanding-next').disabled = !state.understandingCorrection.trim();
+        });
+
+        document.getElementById('understanding-next').addEventListener('click', async event => {
+          if (showCorrection && checkRiskBeforeContinue(state.understandingCorrection)) return;
+          if (showCorrection && state.understandingRevision < 2) {
+            state.understandingRevision += 1;
+            const ready = await prepareAiUnderstanding(event.currentTarget, document.getElementById('ai-status'));
+            if (ready) {
+              state.understandingVerdict = '';
+              render();
+            }
+            return;
+          }
+          goNext();
         });
         bindSafetyButtons();
       }
@@ -1928,7 +2137,7 @@
             <input class="text-input" id="custom-need" maxlength="80" value="${escapeHtml(state.customNeed)}" placeholder="나에게 중요했던 것" />
           </div>
           <div class="action-zone sticky-mobile">
-            <button class="primary-button" type="button" id="need-next" ${(state.needs.length || state.customNeed.trim()) ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '내 마음을 한 번 정리해 볼게요'}</button>
+            <button class="primary-button" type="button" id="need-next" ${(state.needs.length || state.customNeed.trim()) ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '조금 더 볼지 정할게요'}</button>
             <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
             <p class="status-message" id="ai-status" aria-live="polite"></p>
           </div>`;
@@ -1936,11 +2145,79 @@
         const input = document.getElementById('custom-need');
         input.addEventListener('input', () => {
           state.customNeed = input.value;
+          resetDepthState();
           state.aiMap = null;
           state.aiMapStatus = '';
           document.getElementById('need-next').disabled = state.needs.length === 0 && !state.customNeed.trim();
         });
-        document.getElementById('need-next').addEventListener('click', async event => {
+        document.getElementById('need-next').addEventListener('click', goNext);
+        bindSafetyButtons();
+      }
+
+      function renderDepthChoice() {
+        const options = [
+          { value: 'deeper', label: '한 질문만 더 이어갈래요', detail: '지금까지의 답에서 아직 남은 한 지점을 살펴봐요.' },
+          { value: 'organize', label: '지금까지의 마음을 정리할래요', detail: '더 답하지 않고 내가 확인한 내용으로 넘어가요.' }
+        ];
+        content.innerHTML = `
+          <h1 class="question compact" tabindex="-1">여기서 한 걸음 더 들어가 볼까요?</h1>
+          <p class="lead">더 오래 답한다고 더 잘한 세션은 아니에요. 지금 내 마음에 맞는 쪽을 골라주세요.</p>
+          <div class="choice-list">${choiceMarkup(options, state.depthChoice)}</div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="depth-choice-next" ${state.depthChoice ? '' : 'disabled'}>${state.depthChoice === 'organize' ? '이제 정리할게요' : '한 질문 더 볼게요'}</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+            <p class="status-message" id="ai-status" aria-live="polite"></p>
+          </div>`;
+        bindSingleChoice('depthChoice', 'depth-choice-next');
+        content.querySelectorAll('[data-choice]').forEach(button => button.addEventListener('click', () => {
+          document.getElementById('depth-choice-next').textContent = button.dataset.choice === 'organize' ? '이제 정리할게요' : '한 질문 더 볼게요';
+        }));
+        document.getElementById('depth-choice-next').addEventListener('click', async event => {
+          state.aiSkipDeep = state.depthChoice !== 'deeper';
+          if (state.aiSkipDeep) {
+            state.aiDeepPrompt = null;
+            state.aiDeepStatus = '';
+            state.deepAnswer = '';
+            const ready = await prepareAiMap(event.currentTarget, document.getElementById('ai-status'));
+            if (ready) goNext();
+            return;
+          }
+          const ready = await prepareAiQuestion('after_need', event.currentTarget, document.getElementById('ai-status'));
+          if (ready) goNext();
+        });
+        bindSafetyButtons();
+      }
+
+      function renderDeep() {
+        const prompt = state.aiDeepPrompt || {
+          question: '그 순간 차마 하지 못한 말이 있나요?',
+          lead: '상대에게 보낼 문장이 아니에요. 내 안에 남은 말 하나만 적어봐요.',
+          label: '하지 못한 말',
+          placeholder: '예: 나도 내 상황을 먼저 물어봐 주길 바랐어'
+        };
+        content.innerHTML = `
+          <h1 class="question${state.aiDeepStatus === 'ai' ? ' ai-generated' : ''}" tabindex="-1">${escapeHtml(prompt.question)}</h1>
+          <p class="lead">${escapeHtml(prompt.lead)}</p>
+          ${aiContextMarkup(state.aiDeepStatus, '지금까지 답한 내용을 반복하지 않고, 직접 고른 목표에 맞춰 한 질문만 더 골랐어요.')}
+          <div class="field">
+            <label class="field-label" for="deep-input">${escapeHtml(prompt.label)}</label>
+            <textarea id="deep-input" maxlength="600" placeholder="${escapeHtml(prompt.placeholder)}">${escapeHtml(state.deepAnswer)}</textarea>
+            <span class="field-helper">정답을 찾지 않아도 괜찮아요. 지금 떠오르는 만큼만 적어주세요.</span>
+          </div>
+          <div class="action-zone sticky-mobile">
+            <button class="primary-button" type="button" id="deep-next" ${state.deepAnswer.trim() ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '이제 내 마음을 정리할게요'}</button>
+            <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+            <p class="status-message" id="ai-status" aria-live="polite"></p>
+          </div>`;
+        const input = document.getElementById('deep-input');
+        input.addEventListener('input', () => {
+          state.deepAnswer = input.value;
+          state.aiMap = null;
+          state.aiMapStatus = '';
+          document.getElementById('deep-next').disabled = !state.deepAnswer.trim();
+        });
+        document.getElementById('deep-next').addEventListener('click', async event => {
+          if (checkRiskBeforeContinue(state.deepAnswer)) return;
           if (state.returnToMap) {
             goNext();
             return;
@@ -1965,6 +2242,9 @@
           { label: '받아들인 뜻', value: state.aiMap?.meaning || state.meaning, target: 'meaning' },
           { label: '중요했던 것', value: needText, target: 'need' }
         ];
+        if (state.deepAnswer.trim()) {
+          rows.push({ label: '더 살펴본 마음', value: state.aiMap?.deeper || state.deepAnswer, target: 'deep' });
+        }
         content.innerHTML = `
           <h1 class="question compact" tabindex="-1">당신이 적어준 말을 한자리에 놓아봤어요.</h1>
           <p class="lead">내 마음과 다르게 정리된 부분이 있다면 직접 고쳐주세요. 이 내용이 정답은 아니에요.</p>
@@ -2147,6 +2427,16 @@
           aiMomentStatus: '',
           aiMeaningPrompt: null,
           aiMeaningStatus: '',
+          aiUnderstanding: null,
+          aiUnderstandingStatus: '',
+          understandingVerdict: '',
+          understandingCorrection: '',
+          understandingRevision: 0,
+          depthChoice: '',
+          aiSkipDeep: false,
+          aiDeepPrompt: null,
+          aiDeepStatus: '',
+          deepAnswer: '',
           aiMap: null,
           aiMapStatus: ''
         });
