@@ -109,12 +109,19 @@
       "description": "정리하지 않은 말을 넉넉하게 적는 밑줄형 텍스트 영역",
       "html": "<label class=\"ds-field\"><span>내가 겪은 일</span><textarea placeholder=\"떠오르는 순서대로 적어주세요\"></textarea></label>",
       "css": ".ds-field{display:grid;gap:8px;color:#1C2420;font:700 13px/1.5 'Noto Sans KR',sans-serif}.ds-field textarea{min-height:128px;padding:14px 2px;border:0;border-bottom:1px solid #D8D2C5;border-radius:0;background:transparent;color:#1C2420;font:400 16px/1.8 'Noto Sans KR',sans-serif;resize:vertical}.ds-field textarea:focus{border-color:#173D33;outline:3px solid #F07A5F;outline-offset:3px}"
+    },
+    {
+      "name": "AI Context Note",
+      "kind": "notice",
+      "description": "맞춤 질문의 근거와 실패 시 기본 질문 전환을 조용하게 설명하는 투명성 안내",
+      "html": "<div class=\"ds-ai-note\"><strong>답에 맞춰 이어지는 질문</strong><span>사용자가 적은 말 안에서 다음 질문 하나를 골랐어요.</span></div>",
+      "css": ".ds-ai-note{display:grid;gap:5px;padding:14px 0;border-top:1px solid #D8D2C5;border-bottom:1px solid #D8D2C5;color:#6D6F69;font:400 13px/1.6 'Noto Sans KR',sans-serif}.ds-ai-note strong{color:#173D33;font-weight:700}"
     }
   ],
   "narrative": {
     "northStar": "접힌 마음 지도",
     "overview": "Re:Mind의 화면은 상담 채팅창이 아니라, 사용자가 자기 말을 한 장씩 펼쳐보는 조용한 작업대다. 따뜻한 종이색 위에 짙은 녹색 잉크를 놓고 산호색은 진행과 선택을 확인하는 작은 표시로만 사용한다.",
-    "keyCharacteristics": ["따뜻한 종이 바탕과 차분한 녹색 잉크", "한 번에 한 질문만 펼쳐지는 낮은 인지 부하", "사람의 말이 중심인 비채팅형 구조", "결정권과 안전을 분명히 남기는 인터랙션"],
+    "keyCharacteristics": ["따뜻한 종이 바탕과 차분한 녹색 잉크", "한 번에 한 질문만 펼쳐지는 낮은 인지 부하", "사람의 말이 중심인 비채팅형 구조", "결정권과 안전을 분명히 남기는 인터랙션", "AI 개입과 기본 질문 전환을 숨기지 않는 투명성"],
     "rules": [
       { "name": "Quiet Accent", "body": "산호색은 한 화면의 작은 신호에만 사용한다.", "section": "colors" },
       { "name": "Human Sentence", "body": "제목은 사용자가 스스로 답할 수 있는 질문 또는 선택권을 남기는 문장이어야 한다.", "section": "typography" },

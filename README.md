@@ -19,10 +19,12 @@ Re:Mind는 관계 속에서 생긴 감정과 상황을 한 질문씩 살펴보�
 - 한 번에 한 질문씩 진행
 - 사건·장면·감정·의미·중요했던 마음 구분
 - 감정이 큰 경우 선택적 멈춤
+- 동의 후 답에 맞춰 달라지는 Claude 질문
 - 사용자의 원문만으로 만든 마음 지도와 직접 수정
 - 사용자가 고르는 다음 행동
 - 위험 상황 안전 안내
-- 서버 저장 없이 브라우저에서만 동작
+- 기본 질문 모드는 외부 전송 없이 브라우저에서만 동작
+- AI 연결 실패 시 입력을 유지하고 기본 질문으로 자동 전환
 
 ## 문서
 
@@ -45,4 +47,16 @@ python -m http.server 4173 --directory outputs
 
 `main` 브랜치에 push하면 GitHub Actions가 `outputs` 폴더를 GitHub Pages에 배포합니다.
 
-API 비밀키는 정적 HTML이나 Git 저장소에 넣지 않습니다. 동적 AI 연동은 별도 서버리스 API와 Secret 환경변수를 사용해야 합니다.
+API 비밀키는 정적 HTML이나 Git 저장소에 넣지 않습니다. `worker/`의 Cloudflare Worker가 비밀키를 Secret 환경변수로 보관하고 Anthropic API를 대신 호출합니다.
+
+AI 모드를 공개하려면 Worker를 배포한 뒤 반환된 주소를 `outputs/counseling-test/config.js`의 `aiApiBase`에 넣어야 합니다. 주소가 비어 있으면 공개 화면에서는 기본 질문 모드만 활성화됩니다.
+
+```powershell
+cd worker
+pnpm install
+pnpm exec wrangler login
+pnpm exec wrangler secret put ANTHROPIC_API_KEY
+pnpm exec wrangler deploy
+```
+
+키를 명령줄 인자로 붙이지 말고 `wrangler secret put`의 숨김 입력창에 직접 입력합니다.

@@ -2,9 +2,10 @@
 
 ## 현재 상태
 
-- 모바일 우선 상담형 마음 정리 세션이 정적 HTML로 구현되어 있다.
+- 모바일 우선 상담형 마음 정리 세션과 선택형 Claude 질문 흐름이 구현되어 있다.
 - GitHub Pages 공개 경로는 `https://sunjija.github.io/Re-Mind/counseling-test/`이다.
-- 서버·API·계정 없이 동작하며 입력 내용은 브라우저 메모리에만 머문다.
+- 기본 질문 모드는 서버·API·계정 없이 동작한다. AI 모드는 Cloudflare Worker 배포와 Secret 설정이 필요하다.
+- 현재 `outputs/counseling-test/config.js`의 Worker 주소가 비어 있어 공개 페이지의 AI 선택지는 안전하게 비활성화된 상태다.
 - 이 프로토타입의 목적은 상담 효과를 주장하는 것이 아니라, 질문 구조·말투·완료율·사용자 통제감을 검증하는 것이다.
 
 ## 가장 먼저 읽을 파일
@@ -12,9 +13,10 @@
 1. `PRODUCT.md` — 제품 목적, 경계, 사용자, 검증 가설
 2. `DESIGN.md` — 실제 구현에서 추출한 디자인 규칙
 3. `outputs/counseling-test/index.html` — 배포되는 전체 프로토타입
-4. `outputs/remind_counseling_psychology_validation_v0.1.md` — 상담심리 근거 조사
-5. `docs/WORKLOG_2026-08-10.md` — 이번 구현과 QA 기록
-6. `docs/CLAUDE_INTEGRATION.md` — 비밀키를 노출하지 않는 동적 질문 연동 설계
+4. `worker/src/index.js` — Anthropic 비밀키를 숨기는 Cloudflare Worker
+5. `outputs/remind_counseling_psychology_validation_v0.1.md` — 상담심리 근거 조사
+6. `docs/WORKLOG_2026-08-10.md` — 이번 구현과 QA 기록
+7. `docs/CLAUDE_INTEGRATION.md` — 비밀키를 노출하지 않는 동적 질문 연동·배포 안내
 
 ## 세션 흐름
 
@@ -37,12 +39,15 @@
 
 ## 구현 구조
 
-- 단일 파일: HTML, CSS, JavaScript가 `outputs/counseling-test/index.html`에 함께 있다.
+- 프런트엔드: HTML, CSS, JavaScript가 `outputs/counseling-test/index.html`에 함께 있다.
+- 설정: `outputs/counseling-test/config.js`가 공개 Worker 주소만 제공하며 비밀값은 포함하지 않는다.
+- AI 프록시: `worker/src/index.js`가 Origin·동의·입력 크기·안전 신호를 확인하고 Anthropic의 구조화 응답을 검증한다.
 - 상태: `state` 객체에 현재 단계와 답변이 저장되며 새로고침 시 초기화된다.
 - 렌더링: 단계별 `render*` 함수가 화면을 만들고 `goNext`, `goBack`이 이동을 담당한다.
 - 뒤로가기: `history.pushState`와 `popstate`로 브라우저 뒤로가기를 지원한다.
 - 반응형: 960px 미만은 단일 열, 960px 이상은 300px 맥락 레일과 종이 작업대다.
 - 접근성: 실제 label, button, radio, range, dialog 요소와 focus-visible, reduced-motion 대응을 사용한다.
+- 장애 대응: 13초 타임아웃, API 오류, 잘못된 구조화 응답은 모두 현재 정적 질문으로 되돌린다.
 
 ## 제품 경계
 
@@ -69,7 +74,7 @@ python -m http.server 4173 --directory outputs
 3. 마음 지도가 사용자의 말을 과하게 해석한다고 느끼는지 5점 척도로 확인한다.
 4. 상담형 세션 단독 가치가 확인된 뒤에만 편지·상대 답장 흐름과의 결합을 실험한다.
 5. 서버 저장이 필요해질 때 동의, 삭제, 암호화, 위기 대응 운영 정책을 먼저 설계한다.
-6. Claude 연동은 `docs/CLAUDE_INTEGRATION.md`의 서버리스 구조를 따르며, API 키를 프런트엔드나 Git에 넣지 않는다.
+6. Claude Worker를 배포한 뒤 5~8명의 테스트에서 AI 질문과 기본 질문의 완료율·통제감·과잉 해석 점수를 비교한다.
 
 ## 디자인 스킬 기록
 
@@ -80,3 +85,10 @@ python -m http.server 4173 --directory outputs
 ## 배포
 
 `.github/workflows/deploy-pages.yml`가 `main` 브랜치에 push될 때 `outputs` 폴더를 GitHub Pages에 배포한다. 새 페이지는 반드시 `outputs` 아래에 두어야 한다.
+
+AI 공개 순서:
+
+1. `worker/`에서 의존성을 설치하고 Cloudflare에 로그인한다.
+2. `pnpm exec wrangler secret put ANTHROPIC_API_KEY`로 키를 Secret에 입력한다.
+3. `pnpm exec wrangler deploy`가 반환한 `https://…workers.dev` 주소를 `outputs/counseling-test/config.js`에 넣는다.
+4. Worker의 `/health`에서 `aiConfigured: true`를 확인한 뒤 프런트엔드를 push한다.

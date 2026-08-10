@@ -255,6 +255,121 @@
       stroke-width: 1.7;
     }
 
+    .mode-panel {
+      margin-top: 30px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mode-title {
+      margin: 0;
+      padding: 16px 0 10px;
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .mode-option {
+      position: relative;
+      display: grid;
+      min-height: 66px;
+      grid-template-columns: 24px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .mode-option + .mode-option {
+      border-top: 1px solid rgba(216, 210, 197, .76);
+    }
+
+    .mode-option:has(input:checked) {
+      color: var(--green);
+    }
+
+    .mode-option:has(input:disabled) {
+      color: #8f8a80;
+      cursor: not-allowed;
+    }
+
+    .mode-option input {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      accent-color: var(--green);
+    }
+
+    .mode-copy {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .mode-name {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .mode-detail {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .consent-panel {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .consent-check {
+      display: grid;
+      min-height: 44px;
+      grid-template-columns: 22px 1fr;
+      gap: 10px;
+      align-items: center;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .consent-check input {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      accent-color: var(--green);
+    }
+
+    .ai-context {
+      display: grid;
+      gap: 5px;
+      margin-top: 22px;
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      color: var(--green-mid);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .ai-context strong {
+      color: var(--green);
+      font-size: 13px;
+    }
+
+    .ai-context.fallback {
+      color: var(--muted);
+    }
+
     .choice-list {
       display: grid;
       gap: 10px;
@@ -760,6 +875,17 @@
       text-align: center;
     }
 
+    .action-zone .status-message {
+      grid-column: 1 / -1;
+      grid-row: auto;
+      margin: 0;
+      text-align: left;
+    }
+
+    .primary-button[aria-busy="true"] {
+      cursor: wait;
+    }
+
     dialog {
       width: min(calc(100% - 32px), 540px);
       max-height: calc(100dvh - 32px);
@@ -1024,7 +1150,7 @@
       <div class="fold-progress" id="fold-progress" aria-hidden="true"></div>
       <div class="rail-bottom">
         <button class="rail-safety" type="button" data-open-safety>지금 위험한 상황인가요?</button>
-        <p class="rail-privacy">이 테스트는 입력 내용을 서버에 보내거나 저장하지 않습니다.</p>
+        <p class="rail-privacy" id="rail-privacy">기본 질문은 입력 내용을 서버에 보내거나 저장하지 않습니다.</p>
       </div>
     </aside>
 
@@ -1071,6 +1197,7 @@
     </div>
   </dialog>
 
+  <script src="./config.js"></script>
   <script>
     (() => {
       'use strict';
@@ -1078,6 +1205,8 @@
       const checkIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.5 12.5 3.4 3.4 7.6-8"/></svg>';
       const backIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>';
       const lockIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>';
+      const AI_API_BASE = resolveAiApiBase();
+      const AI_REQUEST_TIMEOUT_MS = 13000;
 
       const goalOptions = [
         { value: '엉킨 마음을 정리하고 싶어요', detail: '무엇이 가장 크게 남았는지 살펴봐요.' },
@@ -1118,7 +1247,16 @@
         comment: '',
         riskChecked: false,
         pauseCompleted: false,
-        returnToMap: false
+        returnToMap: false,
+        mode: AI_API_BASE ? 'ai' : 'static',
+        aiConsent: false,
+        aiSkipMoment: false,
+        aiMomentPrompt: null,
+        aiMomentStatus: '',
+        aiMeaningPrompt: null,
+        aiMeaningStatus: '',
+        aiMap: null,
+        aiMapStatus: ''
       };
 
       const screens = [
@@ -1126,7 +1264,7 @@
         { id: 'goal', stage: 0, render: renderGoal },
         { id: 'clarity-before', stage: 0, render: renderClarityBefore },
         { id: 'story', stage: 1, render: renderStory },
-        { id: 'moment', stage: 1, render: renderMoment },
+        { id: 'moment', stage: 1, render: renderMoment, conditional: () => !state.aiSkipMoment },
         { id: 'emotion', stage: 2, render: renderEmotion },
         { id: 'intensity', stage: 2, render: renderIntensity },
         { id: 'pause', stage: 2, render: renderPause, conditional: () => state.intensity >= 8 },
@@ -1154,6 +1292,146 @@
           .replaceAll('>', '&gt;')
           .replaceAll('"', '&quot;')
           .replaceAll("'", '&#039;');
+      }
+
+      function resolveAiApiBase() {
+        const configured = String(window.REMIND_CONFIG?.aiApiBase || '').trim().replace(/\/$/, '');
+        const isLocal = ['127.0.0.1', 'localhost'].includes(location.hostname);
+        if (isLocal) {
+          const localOverride = new URLSearchParams(location.search).get('api');
+          if (localOverride && /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(localOverride)) {
+            return localOverride.replace(/\/$/, '');
+          }
+        }
+        return configured;
+      }
+
+      function aiModeActive() {
+        return state.mode === 'ai' && state.aiConsent && Boolean(AI_API_BASE);
+      }
+
+      function aiAnswers() {
+        return {
+          goal: state.goal,
+          story: state.story,
+          moment: state.moment,
+          emotions: [...state.emotions, state.customEmotion.trim()].filter(Boolean),
+          intensity: state.intensity,
+          meaning: state.meaning,
+          needs: [...state.needs, state.customNeed.trim()].filter(Boolean)
+        };
+      }
+
+      async function callAi(path, payload) {
+        if (!AI_API_BASE) throw Object.assign(new Error('AI 서버가 연결되지 않았어요.'), { code: 'AI_NOT_CONFIGURED' });
+        const controller = new AbortController();
+        const timer = window.setTimeout(() => controller.abort(), AI_REQUEST_TIMEOUT_MS);
+        try {
+          const response = await fetch(`${AI_API_BASE}${path}`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+          const body = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            const error = new Error(body.error?.message || 'AI 연결이 원활하지 않아요.');
+            error.code = body.error?.code || 'AI_UNAVAILABLE';
+            throw error;
+          }
+          return body;
+        } catch (error) {
+          if (error.name === 'AbortError') throw Object.assign(new Error('AI 응답이 늦어 기본 질문으로 이어갈게요.'), { code: 'AI_TIMEOUT' });
+          throw error;
+        } finally {
+          window.clearTimeout(timer);
+        }
+      }
+
+      function setAiLoading(button, status, message) {
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+        button.dataset.idleLabel = button.textContent;
+        button.textContent = message;
+        if (status) status.textContent = '작성한 답에 맞는 다음 질문 하나를 고르고 있어요.';
+      }
+
+      function clearAiLoading(button, status) {
+        button.removeAttribute('aria-busy');
+        button.textContent = button.dataset.idleLabel || button.textContent;
+        button.disabled = false;
+        if (status) status.textContent = '';
+      }
+
+      async function prepareAiQuestion(phase, button, status) {
+        if (!aiModeActive()) return true;
+        setAiLoading(button, status, '다음 질문을 고르는 중…');
+        try {
+          const response = await callAi('/v1/reflection/next', {
+            consent: true,
+            phase,
+            answers: aiAnswers()
+          });
+          if (phase === 'after_story') {
+            state.aiMomentPrompt = response.prompt;
+            state.aiMomentStatus = 'ai';
+            state.aiSkipMoment = response.prompt?.route === 'use_story_moment';
+            if (state.aiSkipMoment) state.moment = response.prompt.extractedMoment;
+          } else {
+            state.aiMeaningPrompt = response.prompt;
+            state.aiMeaningStatus = 'ai';
+          }
+          return true;
+        } catch (error) {
+          if (error.code === 'SAFETY_CHECK_REQUIRED') {
+            state.riskChecked = false;
+            riskDialog.showModal();
+            return false;
+          }
+          if (phase === 'after_story') {
+            state.aiSkipMoment = false;
+            state.aiMomentPrompt = null;
+            state.aiMomentStatus = 'fallback';
+          } else {
+            state.aiMeaningPrompt = null;
+            state.aiMeaningStatus = 'fallback';
+          }
+          return true;
+        } finally {
+          clearAiLoading(button, status);
+        }
+      }
+
+      async function prepareAiMap(button, status) {
+        if (!aiModeActive()) return true;
+        setAiLoading(button, status, '마음 지도를 정리하는 중…');
+        try {
+          const response = await callAi('/v1/reflection/map', { consent: true, answers: aiAnswers() });
+          state.aiMap = response.map;
+          state.aiMapStatus = 'ai';
+          return true;
+        } catch (error) {
+          if (error.code === 'SAFETY_CHECK_REQUIRED') {
+            state.riskChecked = false;
+            riskDialog.showModal();
+            return false;
+          }
+          state.aiMap = null;
+          state.aiMapStatus = 'fallback';
+          return true;
+        } finally {
+          clearAiLoading(button, status);
+        }
+      }
+
+      function aiContextMarkup(status, successCopy) {
+        if (status === 'ai') {
+          return `<div class="ai-context"><strong>답에 맞춰 이어지는 질문</strong><span>${escapeHtml(successCopy)}</span></div>`;
+        }
+        if (status === 'fallback') {
+          return '<div class="ai-context fallback"><strong>기본 질문으로 이어가요</strong><span>AI 연결이 늦거나 불안정해도 적은 내용은 사라지지 않아요.</span></div>';
+        }
+        return '';
       }
 
       function activeScreenIndexes() {
@@ -1242,6 +1520,9 @@
       function jumpTo(screenId, returnToMap = false) {
         const index = screens.findIndex(screen => screen.id === screenId);
         if (index < 0) return;
+        state.aiMap = null;
+        state.aiMapStatus = '';
+        if (screenId === 'story' || screenId === 'moment') state.aiSkipMoment = false;
         state.returnToMap = returnToMap;
         state.step = index;
         render(true);
@@ -1282,6 +1563,12 @@
               ? selected.filter(item => item !== value)
               : [...selected, value];
             state[key] = nextSelected;
+            state.aiMap = null;
+            state.aiMapStatus = '';
+            if (key === 'emotions') {
+              state.aiMeaningPrompt = null;
+              state.aiMeaningStatus = '';
+            }
             button.setAttribute('aria-pressed', String(nextSelected.includes(value)));
             document.getElementById(buttonId).disabled = nextSelected.length === 0 && !state[key === 'emotions' ? 'customEmotion' : 'customNeed'].trim();
           });
@@ -1305,15 +1592,56 @@
       }
 
       function renderWelcome() {
+        const aiAvailable = Boolean(AI_API_BASE);
+        if (!aiAvailable) state.mode = 'static';
+        const railPrivacy = document.getElementById('rail-privacy');
+        railPrivacy.textContent = state.mode === 'ai'
+          ? '동의한 답변만 질문 생성 시 전송하며 Re:Mind는 저장하지 않습니다.'
+          : '기본 질문은 입력 내용을 서버에 보내거나 저장하지 않습니다.';
         content.innerHTML = `
           <h1 class="question" tabindex="-1">말을 잘 고르지 않아도 괜찮아요.</h1>
           <p class="lead">지금 마음에 걸리는 일을 한 질문씩 천천히 따라가 볼게요. 답하기 어려운 질문은 건너뛰어도 돼요.</p>
-          <div class="privacy-note">${lockIcon}<span>작성한 내용은 이 기기에만 잠시 머물고, 서버로 전송되지 않아요. 새로고침하면 모두 사라집니다.</span></div>
+          <fieldset class="mode-panel">
+            <legend class="mode-title">질문 방식을 골라주세요</legend>
+            <label class="mode-option">
+              <input type="radio" name="session-mode" value="ai" ${state.mode === 'ai' ? 'checked' : ''} ${aiAvailable ? '' : 'disabled'} />
+              <span class="mode-copy"><span class="mode-name">내 답에 맞는 질문 받기</span><span class="mode-detail">Claude가 방금 적은 답을 보고 다음 질문 하나를 고릅니다.${aiAvailable ? '' : ' AI 서버 연결 후 사용할 수 있어요.'}</span></span>
+            </label>
+            <label class="mode-option">
+              <input type="radio" name="session-mode" value="static" ${state.mode === 'static' ? 'checked' : ''} />
+              <span class="mode-copy"><span class="mode-name">기본 질문으로만 진행하기</span><span class="mode-detail">외부 전송 없이 미리 정한 질문 순서로 살펴봅니다.</span></span>
+            </label>
+          </fieldset>
+          <div class="consent-panel" id="ai-consent-panel" ${state.mode === 'ai' ? '' : 'hidden'}>
+            <span>AI 질문을 선택하면 목표와 작성한 답변 일부가 질문 생성 목적으로 Anthropic API에 전송됩니다. Re:Mind 서버에는 저장하지 않습니다.</span>
+            <label class="consent-check"><input type="checkbox" id="ai-consent" ${state.aiConsent ? 'checked' : ''} /><span>전송 내용을 확인했고 AI 질문 사용에 동의해요.</span></label>
+          </div>
+          <div class="privacy-note">${lockIcon}<span id="privacy-copy">${state.mode === 'ai' ? '동의한 답변만 질문 생성 시 전송되며, 새로고침하면 이 화면의 내용은 사라집니다.' : '작성한 내용은 이 기기에만 잠시 머물고, 서버로 전송되지 않아요. 새로고침하면 모두 사라집니다.'}</span></div>
           <div class="action-zone sticky-mobile">
-            <button class="primary-button" type="button" id="start-button">내 마음부터 살펴보기</button>
+            <button class="primary-button" type="button" id="start-button" ${state.mode === 'ai' && !state.aiConsent ? 'disabled' : ''}>내 마음부터 살펴보기</button>
             <button class="safety-button" type="button" data-open-safety>지금 위험하거나 안전하지 않다면</button>
           </div>`;
+        const consentPanel = document.getElementById('ai-consent-panel');
+        const consentInput = document.getElementById('ai-consent');
+        const startButton = document.getElementById('start-button');
+        const privacyCopy = document.getElementById('privacy-copy');
+        content.querySelectorAll('input[name="session-mode"]').forEach(input => input.addEventListener('change', () => {
+          state.mode = input.value;
+          consentPanel.hidden = state.mode !== 'ai';
+          startButton.disabled = state.mode === 'ai' && !state.aiConsent;
+          railPrivacy.textContent = state.mode === 'ai'
+            ? '동의한 답변만 질문 생성 시 전송하며 Re:Mind는 저장하지 않습니다.'
+            : '기본 질문은 입력 내용을 서버에 보내거나 저장하지 않습니다.';
+          privacyCopy.textContent = state.mode === 'ai'
+            ? '동의한 답변만 질문 생성 시 전송되며, 새로고침하면 이 화면의 내용은 사라집니다.'
+            : '작성한 내용은 이 기기에만 잠시 머물고, 서버로 전송되지 않아요. 새로고침하면 모두 사라집니다.';
+        }));
+        consentInput.addEventListener('change', () => {
+          state.aiConsent = consentInput.checked;
+          startButton.disabled = state.mode === 'ai' && !state.aiConsent;
+        });
         document.getElementById('start-button').addEventListener('click', () => {
+          if (state.mode === 'ai' && (!state.aiConsent || !AI_API_BASE)) return;
           state.startedAt = Date.now();
           goNext();
         });
@@ -1371,25 +1699,44 @@
           <div class="action-zone sticky-mobile">
             <button class="primary-button" type="button" id="story-next" ${state.story.trim() ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '조금 더 살펴볼게요'}</button>
             <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+            <p class="status-message" id="ai-status" aria-live="polite"></p>
           </div>`;
         const input = document.getElementById('story-input');
         input.addEventListener('input', () => {
           state.story = input.value;
+          state.aiSkipMoment = false;
+          state.aiMomentPrompt = null;
+          state.aiMomentStatus = '';
+          state.aiMeaningPrompt = null;
+          state.aiMeaningStatus = '';
+          state.aiMap = null;
+          state.aiMapStatus = '';
           document.getElementById('story-next').disabled = !state.story.trim();
         });
-        document.getElementById('story-next').addEventListener('click', () => {
-          if (!checkRiskBeforeContinue(state.story)) goNext();
+        document.getElementById('story-next').addEventListener('click', async event => {
+          if (checkRiskBeforeContinue(state.story)) return;
+          const ready = state.returnToMap
+            ? true
+            : await prepareAiQuestion('after_story', event.currentTarget, document.getElementById('ai-status'));
+          if (ready) goNext();
         });
         bindSafetyButtons();
       }
 
       function renderMoment() {
+        const prompt = state.aiMomentPrompt || {
+          question: '그중에서 자꾸 돌아오는 장면이 있나요?',
+          lead: '사건 전체보다 마음에 가장 오래 남은 순간 하나만 골라봐요.',
+          label: '가장 마음에 남은 순간',
+          placeholder: '예: 내 말을 듣기도 전에 괜찮다며 넘겼던 순간'
+        };
         content.innerHTML = `
-          <h1 class="question" tabindex="-1">그중에서 자꾸 돌아오는 장면이 있나요?</h1>
-          <p class="lead">사건 전체보다 마음에 가장 오래 남은 순간 하나만 골라봐요.</p>
+          <h1 class="question" tabindex="-1">${escapeHtml(prompt.question)}</h1>
+          <p class="lead">${escapeHtml(prompt.lead)}</p>
+          ${aiContextMarkup(state.aiMomentStatus, '방금 적은 상황에서 아직 선명하지 않은 부분을 묻고 있어요. 질문이 맞지 않으면 내 말로 다르게 답해도 돼요.')}
           <div class="field">
-            <label class="field-label" for="moment-input">가장 마음에 남은 순간</label>
-            <textarea id="moment-input" maxlength="600" placeholder="예: 내 말을 듣기도 전에 괜찮다며 넘겼던 순간">${escapeHtml(state.moment)}</textarea>
+            <label class="field-label" for="moment-input">${escapeHtml(prompt.label)}</label>
+            <textarea id="moment-input" maxlength="600" placeholder="${escapeHtml(prompt.placeholder)}">${escapeHtml(state.moment)}</textarea>
             <span class="field-helper">딱 떠오르는 장면이 없다면 “전체적으로 답답했다”처럼 적어도 괜찮아요.</span>
           </div>
           <div class="action-zone sticky-mobile">
@@ -1399,6 +1746,10 @@
         const input = document.getElementById('moment-input');
         input.addEventListener('input', () => {
           state.moment = input.value;
+          state.aiMeaningPrompt = null;
+          state.aiMeaningStatus = '';
+          state.aiMap = null;
+          state.aiMapStatus = '';
           document.getElementById('moment-next').disabled = !state.moment.trim();
         });
         document.getElementById('moment-next').addEventListener('click', () => {
@@ -1411,6 +1762,7 @@
         content.innerHTML = `
           <h1 class="question" tabindex="-1">그 장면에서 마음은 어떤 쪽에 가까웠나요?</h1>
           <p class="lead">한 가지로 딱 맞지 않아도 괜찮아요. 가까운 감정을 여러 개 골라도 돼요.</p>
+          ${state.aiSkipMoment ? '<div class="ai-context"><strong>겹치는 질문은 건너뛰었어요</strong><span>처음 적은 답 안에 구체적인 장면이 이미 있어, 같은 내용을 다시 묻지 않았어요.</span></div>' : ''}
           <div class="chip-grid" aria-label="감정 선택">${chipMarkup(emotions, state.emotions)}</div>
           <div class="field">
             <label class="field-label" for="custom-emotion">목록에 없는 마음이 있다면</label>
@@ -1424,6 +1776,10 @@
         const input = document.getElementById('custom-emotion');
         input.addEventListener('input', () => {
           state.customEmotion = input.value;
+          state.aiMeaningPrompt = null;
+          state.aiMeaningStatus = '';
+          state.aiMap = null;
+          state.aiMapStatus = '';
           document.getElementById('emotion-next').disabled = state.emotions.length === 0 && !state.customEmotion.trim();
         });
         document.getElementById('emotion-next').addEventListener('click', goNext);
@@ -1443,15 +1799,27 @@
           <div class="action-zone sticky-mobile">
             <button class="primary-button" type="button" id="intensity-next">이 정도예요</button>
             <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+            <p class="status-message" id="ai-status" aria-live="polite"></p>
           </div>`;
         const range = document.getElementById('intensity-range');
         updateRangeVisual(range);
         range.addEventListener('input', () => {
           state.intensity = Number(range.value);
+          state.aiMeaningPrompt = null;
+          state.aiMeaningStatus = '';
+          state.aiMap = null;
+          state.aiMapStatus = '';
           document.getElementById('range-reading').textContent = range.value;
           updateRangeVisual(range);
         });
-        document.getElementById('intensity-next').addEventListener('click', goNext);
+        document.getElementById('intensity-next').addEventListener('click', async event => {
+          if (state.intensity >= 8) {
+            goNext();
+            return;
+          }
+          const ready = await prepareAiQuestion('after_intensity', event.currentTarget, document.getElementById('ai-status'));
+          if (ready) goNext();
+        });
         bindSafetyButtons();
       }
 
@@ -1471,12 +1839,17 @@
             <button class="primary-button" type="button" id="pause-start">${state.pauseCompleted ? '조금 쉬었어요' : '20초만 멈춰볼게요'}</button>
             <button class="secondary-button" type="button" id="pause-skip">지금은 괜찮아요, 이어갈게요</button>
             <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+            <p class="status-message" id="ai-status" aria-live="polite"></p>
           </div>`;
         let timerId = null;
         let remaining = 20;
         const start = document.getElementById('pause-start');
         const skip = document.getElementById('pause-skip');
-        if (state.pauseCompleted) start.addEventListener('click', goNext);
+        const continueFromPause = async button => {
+          const ready = await prepareAiQuestion('after_intensity', button, document.getElementById('ai-status'));
+          if (ready) goNext();
+        };
+        if (state.pauseCompleted) start.addEventListener('click', () => continueFromPause(start));
         else start.addEventListener('click', () => {
           start.disabled = true;
           skip.disabled = true;
@@ -1491,25 +1864,32 @@
               document.getElementById('pause-instruction').textContent = '조금 더 살펴볼 수 있을 때 다음으로 이어가요.';
               start.disabled = false;
               start.textContent = '이제 이어갈게요';
-              start.addEventListener('click', goNext, { once: true });
+              start.addEventListener('click', () => continueFromPause(start), { once: true });
               skip.disabled = false;
             }
           }, 1000);
         }, { once: true });
-        skip.addEventListener('click', () => {
+        skip.addEventListener('click', async () => {
           if (timerId) window.clearInterval(timerId);
-          goNext();
+          await continueFromPause(skip);
         });
         bindSafetyButtons();
       }
 
       function renderMeaning() {
+        const prompt = state.aiMeaningPrompt || {
+          question: '그 순간, 나에게는 어떤 뜻으로 느껴졌나요?',
+          lead: '상대의 실제 의도를 맞히는 질문은 아니에요. 그 일이 내 마음에 어떻게 닿았는지 적어주세요.',
+          label: '내가 받아들인 의미',
+          placeholder: '예: 내 마음이 중요하지 않은 것처럼 느껴졌어요'
+        };
         content.innerHTML = `
-          <h1 class="question" tabindex="-1">그 순간, 나에게는 어떤 뜻으로 느껴졌나요?</h1>
-          <p class="lead">상대의 실제 의도를 맞히는 질문은 아니에요. 그 일이 내 마음에 어떻게 닿았는지 적어주세요.</p>
+          <h1 class="question" tabindex="-1">${escapeHtml(prompt.question)}</h1>
+          <p class="lead">${escapeHtml(prompt.lead)}</p>
+          ${aiContextMarkup(state.aiMeaningStatus, '지금까지 고른 감정과 강도를 보고, 상대의 속마음이 아니라 내 경험을 더 분명히 볼 수 있는 질문을 골랐어요.')}
           <div class="field">
-            <label class="field-label" for="meaning-input">내가 받아들인 의미</label>
-            <textarea id="meaning-input" maxlength="600" placeholder="예: 내 마음이 중요하지 않은 것처럼 느껴졌어요">${escapeHtml(state.meaning)}</textarea>
+            <label class="field-label" for="meaning-input">${escapeHtml(prompt.label)}</label>
+            <textarea id="meaning-input" maxlength="600" placeholder="${escapeHtml(prompt.placeholder)}">${escapeHtml(state.meaning)}</textarea>
             <span class="field-helper">“상대는 분명히…”보다 “나에게는 …처럼 느껴졌다”로 시작하면 구분하기 쉬워요.</span>
           </div>
           <div class="action-zone sticky-mobile">
@@ -1519,9 +1899,13 @@
         const input = document.getElementById('meaning-input');
         input.addEventListener('input', () => {
           state.meaning = input.value;
+          state.aiMap = null;
+          state.aiMapStatus = '';
           document.getElementById('meaning-next').disabled = !state.meaning.trim();
         });
-        document.getElementById('meaning-next').addEventListener('click', goNext);
+        document.getElementById('meaning-next').addEventListener('click', () => {
+          if (!checkRiskBeforeContinue(state.meaning)) goNext();
+        });
         bindSafetyButtons();
       }
 
@@ -1537,30 +1921,45 @@
           <div class="action-zone sticky-mobile">
             <button class="primary-button" type="button" id="need-next" ${(state.needs.length || state.customNeed.trim()) ? '' : 'disabled'}>${state.returnToMap ? '수정한 내용으로 지도 보기' : '내 마음을 한 번 정리해 볼게요'}</button>
             <button class="safety-button" type="button" data-open-safety>지금 위험한 상황인가요?</button>
+            <p class="status-message" id="ai-status" aria-live="polite"></p>
           </div>`;
         bindMultiChips('needs', 'need-next');
         const input = document.getElementById('custom-need');
         input.addEventListener('input', () => {
           state.customNeed = input.value;
+          state.aiMap = null;
+          state.aiMapStatus = '';
           document.getElementById('need-next').disabled = state.needs.length === 0 && !state.customNeed.trim();
         });
-        document.getElementById('need-next').addEventListener('click', goNext);
+        document.getElementById('need-next').addEventListener('click', async event => {
+          if (state.returnToMap) {
+            goNext();
+            return;
+          }
+          const ready = await prepareAiMap(event.currentTarget, document.getElementById('ai-status'));
+          if (ready) goNext();
+        });
         bindSafetyButtons();
       }
 
       function renderMap() {
-        const emotionText = [...state.emotions, state.customEmotion.trim()].filter(Boolean).join(', ');
-        const needText = [...state.needs, state.customNeed.trim()].filter(Boolean).join(', ');
+        const emotionText = state.aiMap?.emotions?.length
+          ? state.aiMap.emotions.join(', ')
+          : [...state.emotions, state.customEmotion.trim()].filter(Boolean).join(', ');
+        const needText = state.aiMap?.needs?.length
+          ? state.aiMap.needs.join(', ')
+          : [...state.needs, state.customNeed.trim()].filter(Boolean).join(', ');
         const rows = [
-          { label: '있었던 일', value: state.story, target: 'story' },
-          { label: '남은 장면', value: state.moment, target: 'moment' },
+          { label: '있었던 일', value: state.aiMap?.event || state.story, target: 'story' },
+          { label: '남은 장면', value: state.aiMap?.moment || state.moment, target: 'moment' },
           { label: '느낀 마음', value: emotionText, target: 'emotion' },
-          { label: '받아들인 뜻', value: state.meaning, target: 'meaning' },
+          { label: '받아들인 뜻', value: state.aiMap?.meaning || state.meaning, target: 'meaning' },
           { label: '중요했던 것', value: needText, target: 'need' }
         ];
         content.innerHTML = `
           <h1 class="question compact" tabindex="-1">당신이 적어준 말을 한자리에 놓아봤어요.</h1>
           <p class="lead">내 마음과 다르게 정리된 부분이 있다면 직접 고쳐주세요. 이 내용이 정답은 아니에요.</p>
+          ${aiContextMarkup(state.aiMapStatus, 'AI는 새 의미를 덧붙이지 않고, 사용자가 적거나 고른 말 안에서 짧은 구절만 골랐어요. 마음과 다르면 언제든 직접 고칠 수 있어요.')}
           <div class="mind-map">${rows.map(row => `
             <div class="map-row">
               <span class="map-label">${row.label}</span>
@@ -1661,6 +2060,7 @@
             <div class="result-line"><dt>오늘 알아차린 마음</dt><dd>${escapeHtml(emotionText)}${needText ? `<br />그 안에서 ${escapeHtml(needText)}이 중요했어요.` : ''}</dd></div>
             <div class="result-line"><dt>지금 내가 고른 다음</dt><dd>${escapeHtml(state.nextChoice)}</dd></div>
             <div class="result-line"><dt>마음의 선명함</dt><dd>${state.clarityBefore}점에서 ${state.clarityAfter}점</dd></div>
+            <div class="result-line"><dt>질문 방식</dt><dd>${state.mode === 'ai' ? '내 답에 맞는 질문' : '기본 질문'}</dd></div>
           </dl>
           <div class="privacy-note">${lockIcon}<span>아래 복사 내용에는 개인적인 상황과 직접 적은 문장을 넣지 않아요. 평가 점수와 한 줄 의견만 복사됩니다.</span></div>
           <div class="action-zone">
@@ -1679,6 +2079,7 @@
           '',
           `세션 목표: ${state.goal}`,
           `마음의 명료도: ${state.clarityBefore} → ${state.clarityAfter}`,
+          `질문 방식: ${state.mode === 'ai' ? '내 답에 맞는 질문' : '기본 질문'}`,
           `내 말을 가깝게 정리함: ${state.feedback.understood}/5`,
           `과하게 해석한다고 느낌: ${state.feedback.inferred}/5`,
           `선택권이 남아 있었음: ${state.feedback.agency}/5`,
@@ -1729,7 +2130,16 @@
           comment: '',
           riskChecked: false,
           pauseCompleted: false,
-          returnToMap: false
+          returnToMap: false,
+          mode: AI_API_BASE ? 'ai' : 'static',
+          aiConsent: false,
+          aiSkipMoment: false,
+          aiMomentPrompt: null,
+          aiMomentStatus: '',
+          aiMeaningPrompt: null,
+          aiMeaningStatus: '',
+          aiMap: null,
+          aiMapStatus: ''
         });
         history.replaceState({ step: 0 }, '', '#welcome');
         render();
