@@ -183,7 +183,7 @@
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), AI_REQUEST_TIMEOUT_MS);
     try {
-      const response = await fetch(`${AI_API_BASE}${path}`, {
+      const response = await fetch(`${AI_API_BASE}${path}?v=evidence-v0.3`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',

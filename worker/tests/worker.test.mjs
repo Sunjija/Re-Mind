@@ -103,6 +103,7 @@ try {
   }), env);
   assert.equal(preflight.status, 204);
   assert.match(preflight.headers.get('access-control-allow-headers'), /X-ReMind-Session/i);
+  assert.equal(preflight.headers.get('cache-control'), 'no-store');
 
   upstreamResultOverride = {
     route: 'ask_moment',

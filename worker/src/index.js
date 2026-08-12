@@ -97,7 +97,10 @@ export default {
 
     if (request.method === 'OPTIONS') {
       if (!origin || !allowedOrigins.has(origin)) return json({ error: { code: 'ORIGIN_NOT_ALLOWED', message: '허용되지 않은 요청이에요.' } }, 403);
-      return new Response(null, { status: 204, headers: cors });
+      return new Response(null, {
+        status: 204,
+        headers: { ...cors, 'Cache-Control': 'no-store' }
+      });
     }
 
     const url = new URL(request.url);
