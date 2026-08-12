@@ -5,7 +5,7 @@ const port = Number(process.env.PORT || 8788);
 const server = http.createServer(async (request, response) => {
   response.setHeader('access-control-allow-origin', request.headers.origin || '*');
   response.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
-  response.setHeader('access-control-allow-headers', 'content-type');
+  response.setHeader('access-control-allow-headers', 'content-type, x-remind-session');
   response.setHeader('content-type', 'application/json; charset=utf-8');
 
   if (request.method === 'OPTIONS') {

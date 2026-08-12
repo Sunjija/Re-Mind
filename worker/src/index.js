@@ -16,6 +16,7 @@ const ANTHROPIC_VERSION = '2023-06-01';
 const DEFAULT_MODEL = 'claude-haiku-4-5';
 const REQUEST_TIMEOUT_MS = 15000;
 const MAX_BODY_BYTES = 18000;
+const SESSION_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const SAFETY_PATTERN = /(죽고\s*싶|자살|해치고|죽여|폭력|맞았|때렸|협박|감금|스토킹|따라다니|안전하지|흉기|칼로)/i;
 const FORBIDDEN_INTERPRETATION = /(진단|장애|가스라이팅|회피형|불안형|나르시시스트|분명히\s*.*의도|헤어져|화해해)/i;
 
@@ -111,6 +112,7 @@ export default {
     try {
       if (request.method !== 'POST') throw new HttpError(405, 'METHOD_NOT_ALLOWED', '지원하지 않는 요청이에요.');
       if (!env.ANTHROPIC_API_KEY) throw new HttpError(503, 'AI_NOT_CONFIGURED', 'AI 연결이 아직 준비되지 않았어요.');
+      await enforceRateLimits(request, env, url.pathname);
       enforceBodyLimit(request);
 
       if (url.pathname === '/v1/reflection/next') {
@@ -131,12 +133,59 @@ export default {
       throw new HttpError(404, 'NOT_FOUND', '요청한 기능을 찾지 못했어요.');
     } catch (error) {
       if (error instanceof HttpError) {
-        return json({ error: { code: error.code, message: error.message } }, error.status, cors);
+        if (error.status >= 500) logOperationalError(request, url.pathname, error);
+        return json(
+          { error: { code: error.code, message: error.message } },
+          error.status,
+          error.status === 429 ? { ...cors, 'retry-after': '60' } : cors
+        );
       }
+      logOperationalError(request, url.pathname, error);
       return json({ error: { code: 'TEMPORARY_FAILURE', message: '지금은 AI 연결이 원활하지 않아요.' } }, 503, cors);
     }
   }
 };
+
+async function enforceRateLimits(request, env, pathname) {
+  const sessionId = String(request.headers.get('x-remind-session') || '').trim();
+  if (!SESSION_ID_PATTERN.test(sessionId)) {
+    throw new HttpError(400, 'SESSION_ID_REQUIRED', '세션을 확인하지 못했어요. 화면을 새로 열어 주세요.');
+  }
+
+  if (!env.SESSION_RATE_LIMITER || !env.GLOBAL_RATE_LIMITER) {
+    throw new HttpError(503, 'RATE_LIMIT_NOT_CONFIGURED', '보호 설정을 확인하는 중이에요. 잠시 후 다시 시도해 주세요.');
+  }
+
+  const sessionResult = await env.SESSION_RATE_LIMITER.limit({ key: `${pathname}:${sessionId}` });
+  if (!sessionResult.success) {
+    logRateLimit(request, pathname, 'session');
+    throw new HttpError(429, 'RATE_LIMITED', '질문 요청이 너무 잦아요. 잠시 쉬었다 이어가 주세요.');
+  }
+
+  const globalResult = await env.GLOBAL_RATE_LIMITER.limit({ key: pathname });
+  if (!globalResult.success) {
+    logRateLimit(request, pathname, 'global');
+    throw new HttpError(429, 'RATE_LIMITED', '지금은 질문 요청이 많아요. 잠시 후 다시 시도해 주세요.');
+  }
+}
+
+function logRateLimit(request, pathname, scope) {
+  console.warn(JSON.stringify({
+    event: 'rate_limited',
+    scope,
+    route: pathname,
+    requestId: request.headers.get('cf-ray') || 'local'
+  }));
+}
+
+function logOperationalError(request, pathname, error) {
+  console.error(JSON.stringify({
+    event: 'worker_error',
+    route: pathname,
+    code: error instanceof HttpError ? error.code : 'UNEXPECTED_ERROR',
+    requestId: request.headers.get('cf-ray') || 'local'
+  }));
+}
 
 async function handleNext(body, env) {
   requireConsent(body);
@@ -387,7 +436,7 @@ function corsHeaders(origin, allowedOrigins) {
   return {
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, X-ReMind-Session',
     'Access-Control-Max-Age': '86400',
     'Vary': 'Origin'
   };

@@ -60,6 +60,7 @@ AI는 사용자의 감정을 정답처럼 해석하거나 대신 말하지 않�
 - 기존 서비스 기획 발표자료: `outputs/remind_product_plan_v0.1.html`, `outputs/remind_product_plan_mobile_v0.1.html`
 - 기존 대화 세션 콘셉트: `outputs/remind_conversation_session_mobile_v0.1.html`
 - 실제 사용자 테스트 결과, 임상 효능 자료, 전문가 감수 기록은 아직 없다. 미래 작업에서 이를 만들어내거나 있는 것처럼 표현하지 않는다.
+- 5~8명 초기 검증의 모집·동의·관찰·판단 기준은 `docs/USER_RESEARCH_PLAN.md`에 정의한다.
 
 ## Product Principles
 

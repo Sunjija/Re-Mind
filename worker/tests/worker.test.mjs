@@ -3,10 +3,15 @@ import worker from '../src/index.js';
 
 const originalFetch = globalThis.fetch;
 const allowedOrigin = 'https://sunjija.github.io';
+const sessionId = '00000000-0000-4000-8000-000000000001';
+const sessionRateLimiter = createRateLimiter();
+const globalRateLimiter = createRateLimiter();
 const env = {
   ANTHROPIC_API_KEY: 'test-key-not-a-real-secret',
   ANTHROPIC_MODEL: 'claude-haiku-4-5',
-  ALLOWED_ORIGINS: `${allowedOrigin},http://127.0.0.1:4173`
+  ALLOWED_ORIGINS: `${allowedOrigin},http://127.0.0.1:4173`,
+  SESSION_RATE_LIMITER: sessionRateLimiter,
+  GLOBAL_RATE_LIMITER: globalRateLimiter
 };
 
 let upstreamPayload = null;
@@ -89,6 +94,15 @@ try {
   assert.equal(upstreamPayload.model, 'claude-haiku-4-5');
   assert.match(upstreamPayload.system, /질문 정책 evidence-v0\.3/);
   assert.match(upstreamPayload.system, /사실로 확인하거나 편들지 않는다/);
+  assert.equal(sessionRateLimiter.calls[0], `/v1/reflection/next:${sessionId}`);
+  assert.equal(globalRateLimiter.calls[0], '/v1/reflection/next');
+
+  const preflight = await worker.fetch(new Request('https://worker.example/v1/reflection/next', {
+    method: 'OPTIONS',
+    headers: { Origin: allowedOrigin }
+  }), env);
+  assert.equal(preflight.status, 204);
+  assert.match(preflight.headers.get('access-control-allow-headers'), /X-ReMind-Session/i);
 
   upstreamResultOverride = {
     route: 'ask_moment',
@@ -179,9 +193,40 @@ try {
   assert.equal(noConsent.status, 400);
   assert.equal((await noConsent.json()).error.code, 'CONSENT_REQUIRED');
 
-  const oversized = await worker.fetch(new Request('https://worker.example/v1/reflection/next', {
+  const missingSession = await worker.fetch(new Request('https://worker.example/v1/reflection/next', {
     method: 'POST',
     headers: { 'content-type': 'application/json', Origin: allowedOrigin },
+    body: JSON.stringify({ consent: true, phase: 'after_story', answers: { story: 'test' } })
+  }), env);
+  assert.equal(missingSession.status, 400);
+  assert.equal((await missingSession.json()).error.code, 'SESSION_ID_REQUIRED');
+
+  const callsBeforeRateLimit = upstreamCalls;
+  sessionRateLimiter.allow = false;
+  const rateLimited = await call('/v1/reflection/next', {
+    consent: true,
+    phase: 'after_story',
+    answers: { story: '연락을 기다렸어요' }
+  });
+  assert.equal(rateLimited.status, 429);
+  assert.equal(rateLimited.headers.get('retry-after'), '60');
+  assert.equal((await rateLimited.json()).error.code, 'RATE_LIMITED');
+  assert.equal(upstreamCalls, callsBeforeRateLimit);
+  sessionRateLimiter.allow = true;
+
+  globalRateLimiter.allow = false;
+  const globallyRateLimited = await call('/v1/reflection/map', {
+    consent: true,
+    answers: { story: '연락을 기다렸어요' }
+  });
+  assert.equal(globallyRateLimited.status, 429);
+  assert.equal((await globallyRateLimited.json()).error.code, 'RATE_LIMITED');
+  assert.equal(upstreamCalls, callsBeforeRateLimit);
+  globalRateLimiter.allow = true;
+
+  const oversized = await worker.fetch(new Request('https://worker.example/v1/reflection/next', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', Origin: allowedOrigin, 'x-remind-session': sessionId },
     body: JSON.stringify({ consent: true, phase: 'after_story', answers: { story: '가'.repeat(7000) } })
   }), env);
   assert.equal(oversized.status, 413);
@@ -195,7 +240,18 @@ try {
 function call(path, body) {
   return worker.fetch(new Request(`https://worker.example${path}`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', Origin: allowedOrigin },
+    headers: { 'content-type': 'application/json', Origin: allowedOrigin, 'x-remind-session': sessionId },
     body: JSON.stringify(body)
   }), env);
+}
+
+function createRateLimiter() {
+  return {
+    allow: true,
+    calls: [],
+    async limit({ key }) {
+      this.calls.push(key);
+      return { success: this.allow };
+    }
+  };
 }

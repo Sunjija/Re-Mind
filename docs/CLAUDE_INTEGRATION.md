@@ -17,6 +17,7 @@ GitHub Pages 모바일 화면
 Cloudflare Worker
   - 정확한 Origin 허용 목록
   - 동의·요청 크기·입력 형식 확인
+  - 무작위 세션 ID와 경로 단위 요청 제한
   - 안전 신호는 Claude를 호출하지 않고 409 반환
   - Anthropic 키는 Secret으로만 보관
         │
@@ -41,7 +42,9 @@ Claude는 진단, 잘잘못 판정, 상대 의도 추측, 화해·이별 권유,
 
 ## 파일
 
-- `outputs/counseling-test/index.html`: AI/기본 질문 선택, 동의, API 호출, 실패 시 정적 폴백
+- `outputs/counseling-test/index.html`: 배포되는 화면 구조
+- `outputs/counseling-test/app.js`: AI/기본 질문 선택, 동의, API 호출, 실패 시 정적 폴백
+- `outputs/counseling-test/research.js`: 자유 서술을 제외한 로컬 사용성 기록
 - `outputs/counseling-test/config.js`: 공개 Worker 주소만 설정
 - `worker/src/index.js`: CORS, 검증, Anthropic 호출, 구조화 출력 검증
 - `worker/src/reflection-policy.js`: 82개 근거를 압축한 실행 정책과 단계별 질문 모듈
@@ -56,6 +59,18 @@ Claude는 진단, 잘잘못 판정, 상대 의도 추측, 화해·이별 권유,
 - 키는 `wrangler secret put ANTHROPIC_API_KEY`의 숨김 입력창을 통해서만 등록한다.
 - 채팅이나 다른 외부 채널에 한 번이라도 노출된 키는 폐기하고 새 키로 교체하는 것이 안전하다.
 - Worker는 사용자의 자유 서술이나 Anthropic 응답 본문을 로그로 남기지 않는다.
+- 요청 제한 키는 IP가 아니라 새로고침 시 사라지는 무작위 UUID를 사용한다.
+
+## 요청 제한과 관측
+
+- 세션별 제한: API 경로마다 12회/분
+- 전체 보호: API 경로마다 Cloudflare 위치별 180회/분
+- 제한 초과: `429 RATE_LIMITED`와 `Retry-After: 60` 반환
+- 프런트엔드: 입력을 유지하고 같은 단계의 기본 질문으로 전환
+- 로그: 제한 범위, 경로, Cloudflare 요청 ID만 구조화해 남기며 자유 서술과 세션 UUID는 남기지 않음
+- 관측: 사용자 원문을 기록하지 않는 Worker 로그와 10% trace sampling 활성화
+
+Cloudflare Rate Limiting API는 위치별·허용적인 보호 장치이므로 정확한 과금 집계나 강한 사용자 인증을 대신하지 않는다. 공개 사용량이 커지면 Turnstile 또는 계정 기반 인증과 예산 알림을 별도로 검토한다.
 
 ## 배포
 
@@ -102,7 +117,7 @@ python -m http.server 4173 --directory outputs
 node worker/tests/mock-server.mjs
 ```
 
-`http://127.0.0.1:4173/counseling-test/?api=http://127.0.0.1:8788`을 모바일 브라우저로 연다. `api` 쿼리 덮어쓰기는 localhost에서만 허용된다.
+`http://127.0.0.1:4173/counseling-test/?api=http://127.0.0.1:8788`을 모바일 브라우저로 연다. `api` 쿼리 덮어쓰기는 localhost에서만 허용된다. 모의 서버도 `X-ReMind-Session` 사전 요청 헤더를 허용한다.
 
 ## 실패와 안전 처리
 

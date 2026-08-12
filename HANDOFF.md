@@ -18,6 +18,7 @@
 6. `docs/WORKLOG_2026-08-10.md` — 이번 구현과 QA 기록
 7. `docs/CLAUDE_INTEGRATION.md` — 비밀키를 노출하지 않는 동적 질문 연동·배포 안내
 8. `docs/AI_QUESTION_POLICY.md` — 82개 근거를 압축한 질문 모듈·생성 제한·서버 검증 규칙
+9. `docs/USER_RESEARCH_PLAN.md` — 5~8명 초기 사용성 검증 절차·기록 양식·판단 기준
 
 ## 세션 흐름
 
@@ -44,17 +45,19 @@
 
 ## 구현 구조
 
-- 프런트엔드: HTML, CSS, JavaScript가 `outputs/counseling-test/index.html`에 함께 있다.
+- 프런트엔드: `outputs/counseling-test/index.html`, `styles.css`, `app.js`, `research.js`로 화면 구조·스타일·세션 로직·비식별 연구 기록을 분리했다.
 - 설정: `outputs/counseling-test/config.js`가 공개 Worker 주소만 제공하며 비밀값은 포함하지 않는다.
 - AI 프록시: `worker/src/index.js`가 Origin·동의·입력 크기·안전 신호를 확인하고 Anthropic의 구조화 응답을 검증한다.
 - 질문 정책: `worker/src/reflection-policy.js`가 단계별 허용 모듈과 근거 기반 경계를 매 Claude 호출의 시스템 지침에 제공한다.
 - 이해 확인: `/v1/reflection/understanding`은 사용자의 원문에서 짧은 구절과 사용자가 고른 감정 하나만 선택하며, 화면에서 반드시 사용자 확인을 받는다.
 - 상태: `state` 객체에 현재 단계와 답변이 저장되며 새로고침 시 초기화된다.
+- 익명 연구 모드: URL에 `?research=1`을 붙이면 완료 화면에서 개인 원문을 제외한 JSON 기록을 사용자가 직접 저장할 수 있다.
 - 렌더링: 단계별 `render*` 함수가 화면을 만들고 `goNext`, `goBack`이 이동을 담당한다.
 - 뒤로가기: `history.pushState`와 `popstate`로 브라우저 뒤로가기를 지원한다.
 - 반응형: 960px 미만은 단일 열, 960px 이상은 300px 맥락 레일과 종이 작업대다.
 - 접근성: 실제 label, button, radio, range, dialog 요소와 focus-visible, reduced-motion 대응을 사용한다.
 - 장애 대응: 13초 타임아웃, API 오류, 잘못된 구조화 응답은 모두 현재 정적 질문으로 되돌린다.
+- 운영 보호: 브라우저 메모리의 무작위 세션 ID로 세션별 12회/분, 전체 경로별 180회/분 요청 제한을 적용한다. IP와 자유 서술은 제한 키나 로그에 넣지 않는다.
 - 모바일 카피: AI 질문 38자, 설명 72자, 필드명 24자, 예시 56자를 Worker와 CSS 양쪽에서 보호한다.
 
 ## 제품 경계
@@ -84,6 +87,8 @@ python -m http.server 4173 --directory outputs
 5. 서버 저장이 필요해질 때 동의, 삭제, 암호화, 위기 대응 운영 정책을 먼저 설계한다.
 6. Claude Worker를 배포한 뒤 5~8명의 테스트에서 AI 질문과 기본 질문의 완료율·통제감·과잉 해석 점수를 비교한다.
 
+실행 절차와 기록 양식은 `docs/USER_RESEARCH_PLAN.md`를 사용한다. 연구용 기록은 서버로 자동 전송하지 않으며, 참가자가 저장 내용을 확인한 뒤 직접 전달한다.
+
 ## 디자인 스킬 기록
 
 - `TASTE`: 설치 완료. 이 세션에서는 필수 브라우저 MCP 연결이 활성화되지 않아 자동 Design DNA 추출은 실행하지 않았다. 다음 Codex 세션을 재시작하면 사용 가능 여부를 다시 확인한다.
@@ -100,3 +105,5 @@ AI 공개 순서:
 2. `pnpm exec wrangler secret put ANTHROPIC_API_KEY`로 키를 Secret에 입력한다.
 3. `pnpm exec wrangler deploy`가 반환한 `https://…workers.dev` 주소를 `outputs/counseling-test/config.js`에 넣는다.
 4. Worker의 `/health`에서 `aiConfigured: true`를 확인한 뒤 프런트엔드를 push한다.
+
+Cloudflare 배포 전에는 `pnpm exec wrangler deploy --dry-run`과 저장소 루트의 `node scripts/verify.mjs`를 먼저 실행한다.
